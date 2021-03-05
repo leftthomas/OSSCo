@@ -6,6 +6,7 @@ import torch
 from PIL import Image
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
+from tqdm import tqdm
 
 normalizer = {'rgb': [(0.410, 0.445, 0.407), (0.150, 0.152, 0.150)],
               'modal': [(0.259, 0.278, 0.257), (0.201, 0.204, 0.202)]}
@@ -140,3 +141,37 @@ def recall(vectors, ranks, data_name):
         acc['precise'] = (acc['cd@{}'.format(ranks[0])] + acc['dc@{}'.format(ranks[0])] + acc[
             'cross@{}'.format(ranks[0])]) / 3
     return acc
+
+
+# val for one epoch
+def val(net, data_loader, data_name, results, ranks, epoch, epochs):
+    net.eval()
+    vectors = []
+    with torch.no_grad():
+        for data, _, _ in tqdm(data_loader, desc='Feature extracting', dynamic_ncols=True):
+            vectors.append(net(data.cuda())[0])
+        vectors = torch.cat(vectors, dim=0)
+        acc = recall(vectors, ranks, data_loader.dataset.data_name)
+        precise = acc['precise']
+        desc = 'Val Epoch: [{}/{}] '.format(epoch, epochs)
+        for r in ranks:
+            if data_name == 'rgb':
+                results['val_cf@{}'.format(r)].append(acc['cf@{}'.format(r)] * 100)
+                results['val_fr@{}'.format(r)].append(acc['fr@{}'.format(r)] * 100)
+                results['val_cr@{}'.format(r)].append(acc['cr@{}'.format(r)] * 100)
+                results['val_cross@{}'.format(r)].append(acc['cross@{}'.format(r)] * 100)
+            else:
+                results['val_cd@{}'.format(r)].append(acc['cd@{}'.format(r)] * 100)
+                results['val_dc@{}'.format(r)].append(acc['dc@{}'.format(r)] * 100)
+                results['val_cross@{}'.format(r)].append(acc['cross@{}'.format(r)] * 100)
+        if data_name == 'rgb':
+            desc += '| (C<->F) R@{}:{:.2f}% | '.format(ranks[0], acc['cf@{}'.format(ranks[0])] * 100)
+            desc += '(F<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['fr@{}'.format(ranks[0])] * 100)
+            desc += '(C<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['cr@{}'.format(ranks[0])] * 100)
+            desc += '(Cross) R@{}:{:.2f}% | '.format(ranks[0], acc['cross@{}'.format(ranks[0])] * 100)
+        else:
+            desc += '| (C->D) R@{}:{:.2f}% | '.format(ranks[0], acc['cd@{}'.format(ranks[0])] * 100)
+            desc += '(D->C) R@{}:{:.2f}% | '.format(ranks[0], acc['dc@{}'.format(ranks[0])] * 100)
+            desc += '(C<->D) R@{}:{:.2f}% | '.format(ranks[0], acc['cross@{}'.format(ranks[0])] * 100)
+        print(desc)
+    return precise, vectors
