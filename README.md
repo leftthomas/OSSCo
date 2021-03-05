@@ -1,6 +1,7 @@
-# UMDA
+# OSSTCo
 
-A PyTorch implementation of UMDA based on ACMMM 2021 paper [Unspervised Mutli-Domain Agnostic Feature Learning]().
+A PyTorch implementation of OSSTCo based on ICCV 2021 paper
+[Fully Unsupervised Place Recognition With One-Shot Synthesis-based Contrastive Learning]().
 
 ![Network Architecture](result/structure.png)
 
@@ -10,7 +11,7 @@ A PyTorch implementation of UMDA based on ACMMM 2021 paper [Unspervised Mutli-Do
 - [PyTorch](https://pytorch.org)
 
 ```
-conda install pytorch=1.7.0 torchvision torchaudio cudatoolkit=11.0 -c pytorch
+conda install pytorch=1.7.1 torchvision cudatoolkit=11.0 -c pytorch
 ```
 
 ## Dataset
@@ -48,16 +49,28 @@ acquire the details of `train/val` split. The data directory structure is shown 
 ## Usage
 
 ```
-python main.py --data_name modal --method_name simclr --gpu_ids 0 1
+python main.py --data_name modal --iters 20000
 optional arguments:
 --data_root                   Datasets root path [default value is 'data']
 --data_name                   Dataset name [default value is 'rgb'](choices=['rgb', 'modal'])
---method_name                 Method name [default value is 'umda'](choices=['umda', 'simclr', 'moco', 'npid'])
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
 --batch_size                  Number of images in each mini-batch [default value is 16]
 --iters                       Number of bp over the model to train [default value is 40000]
---gpu_ids                     Selected gpus to train [required]  
+--ranks                       Selected recall [default value is '1,2,4,8']
+--save_root                   Result saved root path [default value is 'result']
+```
+
+```
+python comp.py --data_name modal --method_name simclr
+optional arguments:
+--data_root                   Datasets root path [default value is 'data']
+--data_name                   Dataset name [default value is 'rgb'](choices=['rgb', 'modal'])
+--method_name                 Method name [default value is 'simclr'](choices=['simclr', 'moco', 'npid'])
+--proj_dim                    Projected feature dim for computing loss [default value is 128]
+--temperature                 Temperature used in softmax [default value is 0.1]
+--batch_size                  Number of images in each mini-batch [default value is 32]
+--iters                       Number of bp over the model to train [default value is 40000]
 --ranks                       Selected recall [default value is '1,2,4,8']
 --save_root                   Result saved root path [default value is 'result']
 --negs                        Negative sample number [default value is 4096]
@@ -67,21 +80,21 @@ optional arguments:
 For example, to train `moco` on `rgb`:
 
 ```
-python main.py --data_name rgb --method_name moco --batch_size 32 --gpu_ids 1 --momentum 0.999
+python comp.py --data_name rgb --method_name moco --batch_size 32 --momentum 0.999
 ```
 
 to train `npid` on `modal`:
 
 ```
-python main.py --data_name modal --method_name npid --batch_size 64 --gpu_ids 2 --momentum 0.5
+python comp.py --data_name modal --method_name npid --batch_size 64 --momentum 0.5
 ```
 
 ## Benchmarks
 
 The models are trained on one NVIDIA GTX TITAN (12G) GPU. `Adam` is used to optimize the model, `lr` is `1e-3`
-and `weight decay` is `1e-6`. `batch size` is `16` for `umda`, `32` for `simclr` and `moco`, `64` for `npid`.
-`momentum` is `0.999` for `moco`, `lr` is `1e-3` and `betas` is `(0.5, 0.999)` for Generators, `lr` is `1e-4`
-and `betas` is `(0.5, 0.999)` for Discriminators, other hyper-parameters are the default values.
+and `weight decay` is `1e-6`. `batch size` is `16` for `osstco`, `32` for `simclr` and `moco`, `64` for `npid`.
+`momentum` is `0.999` for `moco`, `lr` is `2e-4` and `betas` is `(0.5, 0.999)` for GAN, other hyper-parameters are the
+default values.
 
 ### RGB
 
