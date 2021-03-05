@@ -68,7 +68,7 @@ if __name__ == '__main__':
     parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
     parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
     parser.add_argument('--batch_size', default=32, type=int, help='Number of images in each mini-batch')
-    parser.add_argument('--iters', default=40000, type=int, help='Number of bp over the model to train')
+    parser.add_argument('--epochs', default=200, type=int, help='Number of epoch over the dataset to train')
     parser.add_argument('--ranks', default='1,2,4,8', type=str, help='Selected recall')
     parser.add_argument('--save_root', default='result', type=str, help='Result saved root path')
     # args for NPID and MoCo
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     # args parse
     args = parser.parse_args()
     data_root, data_name, method_name = args.data_root, args.data_name, args.method_name
-    proj_dim, temperature, batch_size, iters = args.proj_dim, args.temperature, args.batch_size, args.iters
+    proj_dim, temperature, batch_size, epochs = args.proj_dim, args.temperature, args.batch_size, args.epochs
     save_root, negs, momentum = args.save_root, args.negs, args.momentum
     ranks = [int(k) for k in args.ranks.split(',')]
 
@@ -88,8 +88,6 @@ if __name__ == '__main__':
     val_data = DomainDataset(data_root, data_name, split='val')
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=True)
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
-    # compute the epochs over the dataset
-    epochs = iters // (len(train_data) // batch_size)
 
     # model setup
     model = Backbone(proj_dim).cuda()

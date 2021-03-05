@@ -56,7 +56,7 @@ def train(net, data_loader, train_optimizer):
 
         total_num += batch_size
         total_loss += loss.item() * batch_size
-        train_bar.set_description('Train Epoch: [{}/{}] Loss: {:.4f}'.format(epoch, epochs, total_loss / total_num))
+        train_bar.set_description('Train Epoch: [{}/{}] Loss: {:.4f}'.format(epoch, gan_epochs, total_loss / total_num))
 
     return total_loss / total_num
 
@@ -71,9 +71,9 @@ if __name__ == '__main__':
     parser.add_argument('--z_num', default=8, type=int, help='Number of used styles')
     parser.add_argument('--batch_size', default=16, type=int,
                         help='Number of images in each mini-batch for contrast stage')
-    parser.add_argument('--gan_iters', default=5000, type=int, help='Number of bp over the gan model to train')
-    parser.add_argument('--contrast_iters', default=5000, type=int,
-                        help='Number of bp over the contrast model to train')
+    parser.add_argument('--gan_epochs', default=1, type=int, help='Number of epoch over the dataset to train gan model')
+    parser.add_argument('--contrast_epochs', default=25, type=int,
+                        help='Number of epoch over the dataset to train contrast model')
     parser.add_argument('--rounds', default=4, type=int,
                         help='Number of round over the gan model and contrast model to train')
     parser.add_argument('--ranks', default='1,2,4,8', type=str, help='Selected recall')
@@ -81,29 +81,29 @@ if __name__ == '__main__':
 
     # args parse
     args = parser.parse_args()
-    data_root, data_name = args.data_root, args.data_name
-    proj_dim, temperature, batch_size, iters = args.proj_dim, args.temperature, args.batch_size, args.iters
-    save_root = args.save_root
-    ranks = [int(k) for k in args.ranks.split(',')]
+    data_root, data_name, proj_dim, temperature = args.data_root, args.data_name, args.proj_dim, args.temperature
+    z_num, batch_size, gan_epochs, contrast_epochs = args.z_num, args.batch_size, args.gan_epochs, args.contrast_epochs
+    rounds, save_root, ranks = args.rounds, args.save_root, [int(k) for k in args.ranks.split(',')]
 
     # data prepare
     train_data = DomainDataset(data_root, data_name, split='train')
     val_data = DomainDataset(data_root, data_name, split='val')
-    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=True)
-    val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
-    # compute the epochs over the dataset
-    epochs = iters // (len(train_data) // batch_size)
+    train_gan_loader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=8)
+    val_gan_loader = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=8)
+    train_contrast_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=True)
+    val_contrast_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
 
     # model setup
-    backbone = Backbone(proj_dim).cuda()
     G_content = Generator(3, 3).cuda()
     G_style = Generator(3, 3).cuda()
     D_content = Discriminator(3).cuda()
     D_style = Discriminator(3).cuda()
+    backbone = Backbone(proj_dim).cuda()
     # optimizer config
     optimizer_backbone = Adam(backbone.parameters(), lr=1e-3, weight_decay=1e-6)
     optimizer_G = Adam(itertools.chain(G_content.parameters(), G_style.parameters()), lr=2e-4, betas=(0.5, 0.999))
-    optimizer_D = Adam(itertools.chain(D_content.parameters(), D_style.parameters()), lr=2e-4, betas=(0.5, 0.999))
+    optimizer_D_content = Adam(D_content.parameters(), lr=2e-4, betas=(0.5, 0.999))
+    optimizer_D_style = Adam(D_style.parameters(), lr=2e-4, betas=(0.5, 0.999))
     loss_criterion = OSSTCoLoss(temperature)
 
     # training loop
@@ -122,10 +122,10 @@ if __name__ == '__main__':
     if not os.path.exists(save_root):
         os.makedirs(save_root)
     best_precise = 0.0
-    for epoch in range(1, epochs + 1):
-        train_loss = train(backbone, train_loader, optimizer_backbone)
+    for epoch in range(1, gan_epochs + 1):
+        train_loss = train(backbone, train_gan_loader, optimizer_backbone)
         results['train_loss'].append(train_loss)
-        val_precise, features = val(backbone, val_loader, results, ranks, epoch, epochs)
+        val_precise, features = val(backbone, val_gan_loader, results, ranks, epoch, gan_epochs)
         results['val_precise'].append(val_precise * 100)
         # save statistics
         data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
