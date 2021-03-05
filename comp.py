@@ -127,7 +127,7 @@ if __name__ == '__main__':
     for epoch in range(1, epochs + 1):
         train_loss = train(model, train_loader, optimizer)
         results['train_loss'].append(train_loss)
-        val_precise, features = val(model, val_loader, data_name, results, ranks, epoch, epochs)
+        val_precise, features = val(model, val_loader, results, ranks, epoch, epochs)
         results['val_precise'].append(val_precise * 100)
         # save statistics
         data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))

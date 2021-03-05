@@ -1,5 +1,6 @@
 import glob
 import os
+import random
 
 import numpy as np
 import torch
@@ -8,24 +9,21 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from tqdm import tqdm
 
-normalizer = {'rgb': [(0.410, 0.445, 0.407), (0.150, 0.152, 0.150)],
-              'modal': [(0.259, 0.278, 0.257), (0.201, 0.204, 0.202)]}
 
-
-def get_transform(data_name, split='train'):
+def get_transform(split='train'):
     if split == 'train':
         return transforms.Compose([
-            transforms.RandomResizedCrop(256, scale=(0.2, 1.0)),
+            transforms.RandomResizedCrop(256, (1.0, 1.12), interpolation=Image.BICUBIC),
             transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
             transforms.RandomGrayscale(p=0.2),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.ToTensor(),
-            transforms.Normalize(normalizer[data_name][0], normalizer[data_name][1])])
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     else:
         return transforms.Compose([
             transforms.Resize(256),
             transforms.ToTensor(),
-            transforms.Normalize(normalizer[data_name][0], normalizer[data_name][1])])
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 
 class DomainDataset(Dataset):
@@ -36,7 +34,7 @@ class DomainDataset(Dataset):
         image_path = os.path.join(data_root, data_name, split, '*', '*', '*.png')
         self.images = glob.glob(image_path)
         self.images.sort()
-        self.transform = get_transform(data_name, split)
+        self.transform = get_transform(split)
 
     def __getitem__(self, index):
         img_name = self.images[index]
@@ -144,7 +142,7 @@ def recall(vectors, ranks, data_name):
 
 
 # val for one epoch
-def val(net, data_loader, data_name, results, ranks, epoch, epochs):
+def val(net, data_loader, results, ranks, epoch, epochs):
     net.eval()
     vectors = []
     with torch.no_grad():
@@ -155,7 +153,7 @@ def val(net, data_loader, data_name, results, ranks, epoch, epochs):
         precise = acc['precise']
         desc = 'Val Epoch: [{}/{}] '.format(epoch, epochs)
         for r in ranks:
-            if data_name == 'rgb':
+            if data_loader.dataset.data_name == 'rgb':
                 results['val_cf@{}'.format(r)].append(acc['cf@{}'.format(r)] * 100)
                 results['val_fr@{}'.format(r)].append(acc['fr@{}'.format(r)] * 100)
                 results['val_cr@{}'.format(r)].append(acc['cr@{}'.format(r)] * 100)
@@ -164,7 +162,7 @@ def val(net, data_loader, data_name, results, ranks, epoch, epochs):
                 results['val_cd@{}'.format(r)].append(acc['cd@{}'.format(r)] * 100)
                 results['val_dc@{}'.format(r)].append(acc['dc@{}'.format(r)] * 100)
                 results['val_cross@{}'.format(r)].append(acc['cross@{}'.format(r)] * 100)
-        if data_name == 'rgb':
+        if data_loader.dataset.data_name == 'rgb':
             desc += '| (C<->F) R@{}:{:.2f}% | '.format(ranks[0], acc['cf@{}'.format(ranks[0])] * 100)
             desc += '(F<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['fr@{}'.format(ranks[0])] * 100)
             desc += '(C<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['cr@{}'.format(ranks[0])] * 100)
@@ -175,3 +173,32 @@ def val(net, data_loader, data_name, results, ranks, epoch, epochs):
             desc += '(C<->D) R@{}:{:.2f}% | '.format(ranks[0], acc['cross@{}'.format(ranks[0])] * 100)
         print(desc)
     return precise, vectors
+
+
+class ReplayBuffer:
+    def __init__(self, max_size=50):
+        self.max_size = max_size
+        self.data = []
+
+    def push_and_pop(self, data):
+        to_return = []
+        for element in data.detach():
+            element = torch.unsqueeze(element, 0)
+            if len(self.data) < self.max_size:
+                self.data.append(element)
+                to_return.append(element)
+            else:
+                if random.uniform(0, 1) > 0.5:
+                    i = random.randint(0, self.max_size - 1)
+                    to_return.append(self.data[i].clone())
+                    self.data[i] = element
+                else:
+                    to_return.append(element)
+        return torch.cat(to_return)
+
+
+def weights_init_normal(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        torch.nn.init.normal_(m.weight, 0.0, 0.02)
+        torch.nn.init.constant_(m.bias, 0.0)
