@@ -18,7 +18,7 @@ parser.add_argument('--momentum', default=0.5, type=float,
 # args parse
 args = parser.parse_args()
 data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
-temperature, batch_size, total_iters = args.temperature, args.batch_size, args.total_iters
+temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
 ranks, save_root, negs, momentum = args.ranks, args.save_root, args.negs, args.momentum
 
 # data prepare
@@ -50,8 +50,8 @@ results = {'train_loss': [], 'val_precise': []}
 save_name_pre = '{}_{}'.format(domains, method_name)
 if not os.path.exists(save_root):
     os.makedirs(save_root)
-best_precise, total_loss, current_iters = 0.0, 0.0, 0
-epochs = (total_iters // (len(train_data) // batch_size)) + 1
+best_precise, total_loss, current_iter = 0.0, 0.0, 0
+epochs = (total_iter // (len(train_data) // batch_size)) + 1
 
 # train loop
 for epoch in range(1, epochs + 1):
@@ -85,17 +85,16 @@ for epoch in range(1, epochs + 1):
             for parameter_q, parameter_k in zip(model.parameters(), shadow.parameters()):
                 parameter_k.data.copy_(parameter_k.data * momentum + parameter_q.data * (1.0 - momentum))
 
-        current_iters += 1
+        current_iter += 1
         total_loss += loss.item()
         train_bar.set_description(
-            'Train Iters: [{}/{}] Loss: {:.4f}'.format(current_iters, total_iters, total_loss / current_iters))
-        if current_iters % 100 == 0:
-            results['train_loss'].append(total_loss / current_iters)
+            'Train Iter: [{}/{}] Loss: {:.4f}'.format(current_iter, total_iter, total_loss / current_iter))
+        if current_iter % 100 == 0:
+            results['train_loss'].append(total_loss / current_iter)
             # every 100 iters to val the model
-            val_precise, features = val_contrast(model, val_loader, results, ranks, current_iters, total_iters)
-            results['val_precise'].append(val_precise * 100)
+            val_precise, features = val_contrast(model, val_loader, results, ranks, current_iter, total_iter)
             # save statistics
-            data_frame = pd.DataFrame(data=results, index=range(1, current_iters // 100 + 1))
+            data_frame = pd.DataFrame(data=results, index=range(1, current_iter // 100 + 1))
             data_frame.to_csv('{}/{}_results.csv'.format(save_root, save_name_pre), index_label='iter')
 
             if val_precise > best_precise:
@@ -103,5 +102,5 @@ for epoch in range(1, epochs + 1):
                 torch.save(model.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
                 torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
         # stop iter data when arriving the total bp numbers
-        if current_iters == total_iters:
+        if current_iter == total_iter:
             break

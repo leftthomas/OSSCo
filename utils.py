@@ -28,7 +28,7 @@ def parse_common_args():
     parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
     parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
     parser.add_argument('--batch_size', default=16, type=int, help='Number of images in each mini-batch')
-    parser.add_argument('--total_iters', default=40000, type=int, help='Number of bp to train')
+    parser.add_argument('--total_iter', default=40000, type=int, help='Number of bp to train')
     parser.add_argument('--ranks', nargs='+', default=[1, 2, 4, 8], type=int, help='Selected recall to val')
     parser.add_argument('--save_root', default='result', type=str, help='Result saved root path')
     return parser
@@ -89,7 +89,7 @@ class DomainDataset(Dataset):
         return images, categories, labels
 
 
-def recall(vectors, ranks, data_name):
+def recall(vectors, ranks, domains, categories, labels):
     if data_name == 'rgb':
         labels = torch.arange(len(vectors) // 3, device=vectors.device)
         labels = torch.cat((labels, labels, labels), dim=0)
@@ -183,37 +183,23 @@ def recall(vectors, ranks, data_name):
     return acc
 
 
-# val for one epoch
-def val_contrast(net, data_loader, results, ranks, epoch, epochs):
+# val for all val data
+def val_contrast(net, data_loader, results, ranks, current_iter, total_iter):
     net.eval()
     vectors = []
     with torch.no_grad():
-        for data, _, _ in tqdm(data_loader, desc='Feature extracting', dynamic_ncols=True):
+        for data, _, _, _, _, _ in tqdm(data_loader, desc='Feature extracting', dynamic_ncols=True):
             vectors.append(net(data.cuda())[0])
         vectors = torch.cat(vectors, dim=0)
-        acc = recall(vectors, ranks, data_loader.dataset.domains)
-        precise = acc['precise']
-        desc = 'Val Epoch: [{}/{}] '.format(epoch, epochs)
-        for r in ranks:
-            if data_loader.dataset.domains == 'rgb':
-                results['val_cf@{}'.format(r)].append(acc['cf@{}'.format(r)] * 100)
-                results['val_fr@{}'.format(r)].append(acc['fr@{}'.format(r)] * 100)
-                results['val_cr@{}'.format(r)].append(acc['cr@{}'.format(r)] * 100)
-                results['val_cross@{}'.format(r)].append(acc['cross@{}'.format(r)] * 100)
+        acc = recall(vectors, ranks, data_loader.dataset.domains, data_loader.dataset.categories,
+                     data_loader.dataset.labels)
+        precise = acc['val_precise'] * 100
+        print('Val Iter: [{}/{}] Precise: {:.2f}%'.format(current_iter, total_iter, precise))
+        for key, value in acc.items():
+            if key in results:
+                results[key].append(value * 100)
             else:
-                results['val_cd@{}'.format(r)].append(acc['cd@{}'.format(r)] * 100)
-                results['val_dc@{}'.format(r)].append(acc['dc@{}'.format(r)] * 100)
-                results['val_cross@{}'.format(r)].append(acc['cross@{}'.format(r)] * 100)
-        if data_loader.dataset.domains == 'rgb':
-            desc += '| (C<->F) R@{}:{:.2f}% | '.format(ranks[0], acc['cf@{}'.format(ranks[0])] * 100)
-            desc += '(F<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['fr@{}'.format(ranks[0])] * 100)
-            desc += '(C<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['cr@{}'.format(ranks[0])] * 100)
-            desc += '(Cross) R@{}:{:.2f}% | '.format(ranks[0], acc['cross@{}'.format(ranks[0])] * 100)
-        else:
-            desc += '| (C->D) R@{}:{:.2f}% | '.format(ranks[0], acc['cd@{}'.format(ranks[0])] * 100)
-            desc += '(D->C) R@{}:{:.2f}% | '.format(ranks[0], acc['dc@{}'.format(ranks[0])] * 100)
-            desc += '(C<->D) R@{}:{:.2f}% | '.format(ranks[0], acc['cross@{}'.format(ranks[0])] * 100)
-        print(desc)
+                results[key] = [value]
     net.train()
     return precise, vectors
 
