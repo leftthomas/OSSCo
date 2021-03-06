@@ -92,8 +92,8 @@ class DomainDataset(Dataset):
 def recall(vectors, ranks, domains, categories, labels):
     domain_vectors, domain_labels, acc = [], [], {}
     for i, domain in enumerate(domains):
-        domain_vectors.append(vectors[categories == i])
-        domain_labels.append(labels[categories == i])
+        domain_vectors.append(vectors[torch.as_tensor(categories) == i])
+        domain_labels.append(torch.as_tensor(labels, device=vectors.device)[torch.as_tensor(categories) == i])
     for i in range(len(domain_vectors)):
         for j in range(i + 1, len(domain_vectors)):
             domain_a_vectors = domain_vectors[i]
@@ -150,7 +150,7 @@ def val_contrast(net, data_loader, results, ranks, current_iter, total_iter):
             if key in results:
                 results[key].append(value * 100)
             else:
-                results[key] = [value]
+                results[key] = [value * 100]
     net.train()
     return precise, vectors
 
