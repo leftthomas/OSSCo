@@ -23,61 +23,68 @@ datasets are used in this repo, you could download these datasets from official 
 acquire the details of `train/val` split. The data directory structure is shown as follows:
 
  ```
-├──rgb
-   ├── train
-       ├── clear (clear images)
-           ├── aachen
-               ├── aachen_000000_000019_leftImg8bit.png
-               └── ...
-           ├── bochum
-               ├── bochum_000000_000313_leftImg8bit.png
-               └── ...
-       ├── fog (fog images)
-           same structure as clear
-           ...       
-       ├── rain (rain images)
-           same structure as clear
-           ...   
-   ├── val
-       same structure as train
-       ...
-├──modal
-   same structure as rgb
+├── train
+   ├── clear (clear images)
+       ├── aachen
+           ├── aachen_000000_000019_leftImg8bit.png
+           └── ...
+       ├── bochum
+           ├── bochum_000000_000313_leftImg8bit.png
+           └── ...
+   ├── fog (fog images)
+       same structure as clear
+       ...       
+   ├── rain (rain images)
+       same structure as clear
+       ...   
+   ├── depth (depth images)
+       same structure as clear
+       ...   
+├── val
+   same structure as train
    ...
 ```
 
 ## Usage
 
 ```
-python main.py/comp.py --data_name modal --rounds 6
+python main.py or comp.py --domains clear fog --ranks 1 5
 optional arguments:
---data_root                   Datasets root path [default value is 'data']
---data_name                   Dataset name [default value is 'rgb'](choices=['rgb', 'modal'])
---method_name                 Method name [default value is 'simclr'](choices=['simclr', 'moco', 'npid'])
+# common args
+--data_root                   cDatasets root path [default value is 'data']
+--method_name                 Compared method name [default value is 'osstco'](choices=['osstco', 'simclr', 'moco', 'npid'])
+--domains                     Selected domains to train [default value is ['clear', 'fog', 'rain']]
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
---z_num                       Number of used styles [default value is 8]
---batch_size                  Number of images in each mini-batch for contrast stage [default value is 16]
---epochs                      Number of epoch over the dataset to train [default value is 200]
---gan_epochs                  Number of epoch over the dataset to train gan model [default value is 1]
---contrast_epochs             Number of epoch over the dataset to train contrast model [default value is 25]
---rounds                      Number of round over the gan model and contrast model to train [default value is 4]
---ranks                       Selected recall [default value is '1,2,4,8']
+--batch_size                  Number of images in each mini-batch [default value is 16]
+--total_iters                 Number of bp to train [default value is 40000]
+--ranks                       Selected recall to val [default value is [1, 2, 4, 8]]
 --save_root                   Result saved root path [default value is 'result']
+# args for osstco
+--style_num                   Number of used styles [default value is 8]
+--gan_iters                   Number of bp to train gan model [default value is 4000]
+--contrast_iters              Number of bp to train contrast model [default value is 4000]
+# args for moco and npid
 --negs                        Negative sample number [default value is 4096]
 --momentum                    Momentum used for the update of memory bank or shadow model [default value is 0.5]
 ```
 
-For example, to train `moco` on `rgb`:
+For example, to train `moco` on `clear` and `fog` domains, report `R@1` and `R@10`:
 
 ```
-python comp.py --data_name rgb --method_name moco --batch_size 32 --momentum 0.999
+python comp.py --method_name moco --domains clear fog --batch_size 32 --ranks 1 10 --momentum 0.999
 ```
 
-to train `npid` on `modal`:
+to train `npid` on `fog`, `rain` and `depth` domains, report `R@1` and `R@5`:
 
 ```
-python comp.py --data_name modal --method_name npid --batch_size 64 --epochs 400
+python comp.py --method_name npid --domains fog rain depth --batch_size 64 --ranks 1 5 --momentum 0.5
+```
+
+to train `osstco` on `clear`, `fog`, `rain` and `depth` domains, with `16` random selected styles:
+
+```
+python main.py --method_name osstco --domains clear fog rain depth --style_num 16
 ```
 
 ## Benchmarks

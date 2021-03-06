@@ -1,4 +1,3 @@
-import argparse
 import itertools
 import os
 
@@ -10,7 +9,7 @@ from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 
 from model import Backbone, Generator, Discriminator, OSSTCoLoss
-from utils import DomainDataset, val_contrast, weights_init_normal, ReplayBuffer
+from utils import DomainDataset, val_contrast, weights_init_normal, ReplayBuffer, parse_common_args
 
 
 # train for one epoch
@@ -54,28 +53,21 @@ def train(net, data_loader, train_optimizer):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Train Model')
-    # common args
-    parser.add_argument('--data_root', default='data', type=str, help='Datasets root path')
-    parser.add_argument('--data_name', default='rgb', type=str, choices=['rgb', 'modal'], help='Dataset name')
-    parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
-    parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
-    parser.add_argument('--z_num', default=8, type=int, help='Number of used styles')
-    parser.add_argument('--batch_size', default=16, type=int,
-                        help='Number of images in each mini-batch for contrast stage')
-    parser.add_argument('--gan_epochs', default=1, type=int, help='Number of epoch over the dataset to train gan model')
-    parser.add_argument('--contrast_epochs', default=25, type=int,
-                        help='Number of epoch over the dataset to train contrast model')
-    parser.add_argument('--rounds', default=4, type=int,
-                        help='Number of round over the gan model and contrast model to train')
-    parser.add_argument('--ranks', default='1,2,4,8', type=str, help='Selected recall')
-    parser.add_argument('--save_root', default='result', type=str, help='Result saved root path')
+    parser = parse_common_args()
+    parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
+    parser.add_argument('--gan_iters', default=4000, type=int, help='Number of bp to train gan model')
+    parser.add_argument('--contrast_iters', default=4000, type=int, help='Number of bp to train contrast model')
 
     # args parse
     args = parser.parse_args()
-    data_root, data_name, proj_dim, temperature = args.data_root, args.data_name, args.proj_dim, args.temperature
-    z_num, batch_size, gan_epochs, contrast_epochs = args.z_num, args.batch_size, args.gan_epochs, args.contrast_epochs
-    rounds, save_root, ranks = args.rounds, args.save_root, [int(k) for k in args.ranks.split(',')]
+    data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
+    temperature, batch_size, total_iters = args.temperature, args.batch_size, args.total_iters
+    style_num, gan_iters, contrast_iters = args.style_num, args.gan_iters, args.contrast_iters
+    ranks, save_root, rounds = args.ranks, args.save_root, total_iters // (gan_iters + contrast_iters)
+    # asserts
+    assert total_iters % (gan_iters + contrast_iters) == 0, \
+        'make sure the gan_iters + contrast_iters can be divided by total_iters'
+    assert method_name == 'osstco', 'not support for {}'.format(method_name)
 
     # data prepare
     train_data = DomainDataset(data_root, data_name, split='train')

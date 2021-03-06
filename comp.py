@@ -10,17 +10,16 @@ from model import Backbone, SimCLRLoss, MoCoLoss, NPIDLoss
 from utils import DomainDataset, val_contrast, parse_common_args
 
 parser = parse_common_args()
-# args for NPID and MoCo
+# args for MoCo and NPID
 parser.add_argument('--negs', default=4096, type=int, help='Negative sample number')
 parser.add_argument('--momentum', default=0.5, type=float,
                     help='Momentum used for the update of memory bank or shadow model')
 
 # args parse
 args = parser.parse_args()
-data_root, domains, method_name = args.data_root, args.domains, args.method_name
-proj_dim, temperature, batch_size, iters = args.proj_dim, args.temperature, args.batch_size, args.iters
-save_root, negs, momentum = args.save_root, args.negs, args.momentum
-ranks = [int(k) for k in args.ranks.split(',')]
+data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
+temperature, batch_size, total_iters = args.temperature, args.batch_size, args.total_iters
+ranks, save_root, negs, momentum = args.ranks, args.save_root, args.negs, args.momentum
 
 # data prepare
 train_data = DomainDataset(data_root, domains, split='train')
@@ -45,14 +44,14 @@ if method_name == 'npid':
 if method_name == 'simclr':
     loss_criterion = SimCLRLoss(temperature)
 else:
-    raise NotImplemented('Not support for {}'.format(method_name))
+    raise NotImplemented('not support for {}'.format(method_name))
 
 results = {'train_loss': [], 'val_precise': []}
 save_name_pre = '{}_{}'.format(domains, method_name)
 if not os.path.exists(save_root):
     os.makedirs(save_root)
 best_precise, total_loss, current_iters = 0.0, 0.0, 0
-epochs = (iters // (len(train_data) // batch_size)) + 1
+epochs = (total_iters // (len(train_data) // batch_size)) + 1
 
 # train loop
 for epoch in range(1, epochs + 1):
@@ -89,11 +88,11 @@ for epoch in range(1, epochs + 1):
         current_iters += 1
         total_loss += loss.item()
         train_bar.set_description(
-            'Train Iters: [{}/{}] Loss: {:.4f}'.format(current_iters, iters, total_loss / current_iters))
+            'Train Iters: [{}/{}] Loss: {:.4f}'.format(current_iters, total_iters, total_loss / current_iters))
         if current_iters % 100 == 0:
             results['train_loss'].append(total_loss / current_iters)
             # every 100 iters to val the model
-            val_precise, features = val_contrast(model, val_loader, results, ranks, current_iters, iters)
+            val_precise, features = val_contrast(model, val_loader, results, ranks, current_iters, total_iters)
             results['val_precise'].append(val_precise * 100)
             # save statistics
             data_frame = pd.DataFrame(data=results, index=range(1, current_iters // 100 + 1))
@@ -103,6 +102,6 @@ for epoch in range(1, epochs + 1):
                 best_precise = val_precise
                 torch.save(model.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
                 torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
-        # stop iter data when arriving the bp numbers
-        if current_iters == iters:
+        # stop iter data when arriving the total bp numbers
+        if current_iters == total_iters:
             break
