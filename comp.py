@@ -39,9 +39,9 @@ if method_name == 'moco':
         # not update by gradient
         param_k.requires_grad = False
     loss_criterion = MoCoLoss(negs, proj_dim, temperature).cuda()
-if method_name == 'npid':
+elif method_name == 'npid':
     loss_criterion = NPIDLoss(len(train_data), negs, proj_dim, momentum, temperature)
-if method_name == 'simclr':
+elif method_name == 'simclr':
     loss_criterion = SimCLRLoss(temperature)
 else:
     raise NotImplemented('not support for {}'.format(method_name))
