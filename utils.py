@@ -90,96 +90,47 @@ class DomainDataset(Dataset):
 
 
 def recall(vectors, ranks, domains, categories, labels):
-    if data_name == 'rgb':
-        labels = torch.arange(len(vectors) // 3, device=vectors.device)
-        labels = torch.cat((labels, labels, labels), dim=0)
-        clear_vectors = vectors[:len(vectors) // 3]
-        fog_vectors = vectors[len(vectors) // 3: 2 * len(vectors) // 3]
-        rain_vectors = vectors[2 * len(vectors) // 3:]
-        clear_labels = labels[:len(vectors) // 3]
-        fog_labels = labels[len(vectors) // 3: 2 * len(vectors) // 3]
-        rain_labels = labels[2 * len(vectors) // 3:]
+    domain_vectors, domain_labels, acc = [], [], {}
+    for i, domain in enumerate(domains):
+        domain_vectors.append(vectors[categories == i])
+        domain_labels.append(labels[categories == i])
+    for i in range(len(domain_vectors)):
+        for j in range(i + 1, len(domain_vectors)):
+            domain_a_vectors = domain_vectors[i]
+            domain_b_vectors = domain_vectors[j]
+            domain_a_labels = domain_labels[i]
+            domain_b_labels = domain_labels[j]
+            # A -> B
+            sim_ab = domain_a_vectors.mm(domain_b_vectors.t())
+            idx_ab = sim_ab.topk(k=ranks[-1], dim=-1, largest=True)[1]
+            # B -> A
+            sim_ba = domain_b_vectors.mm(domain_a_vectors.t())
+            idx_ba = sim_ba.topk(k=ranks[-1], dim=-1, largest=True)[1]
+            # cross domain A and B
+            vectors = torch.cat((domain_a_vectors, domain_b_vectors), dim=0)
+            labels = torch.cat((domain_a_labels, domain_b_labels), dim=0)
+            sim = vectors.mm(vectors.t())
+            sim.fill_diagonal_(-np.inf)
+            idx = sim.topk(k=ranks[-1], dim=-1, largest=True)[1]
 
-        # domain clear ---> domain fog
-        sim_cf = clear_vectors.mm(fog_vectors.t())
-        idx_cf = sim_cf.topk(k=ranks[-1], dim=-1, largest=True)[1]
-        # domain fog ---> domain clear
-        sim_fc = fog_vectors.mm(clear_vectors.t())
-        idx_fc = sim_fc.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-        # domain clear ---> domain rain
-        sim_cr = clear_vectors.mm(rain_vectors.t())
-        idx_cr = sim_cr.topk(k=ranks[-1], dim=-1, largest=True)[1]
-        # domain rain ---> domain clear
-        sim_rc = rain_vectors.mm(clear_vectors.t())
-        idx_rc = sim_rc.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-        # domain fog ---> domain rain
-        sim_fr = fog_vectors.mm(rain_vectors.t())
-        idx_fr = sim_fr.topk(k=ranks[-1], dim=-1, largest=True)[1]
-        # domain rain ---> domain fog
-        sim_rf = rain_vectors.mm(fog_vectors.t())
-        idx_rf = sim_rf.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-        # cross domain
-        sim = vectors.mm(vectors.t())
-        sim.fill_diagonal_(-np.inf)
-        idx = sim.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-        acc = {}
-        for r in ranks:
-            correct_cf = (torch.eq(fog_labels[idx_cf[:, 0:r]], clear_labels.unsqueeze(dim=-1))).any(dim=-1)
-            precise_cf = (torch.sum(correct_cf) / correct_cf.size(0)).item()
-            correct_fc = (torch.eq(clear_labels[idx_fc[:, 0:r]], fog_labels.unsqueeze(dim=-1))).any(dim=-1)
-            precise_fc = (torch.sum(correct_fc) / correct_fc.size(0)).item()
-            acc['cf@{}'.format(r)] = (precise_cf + precise_fc) / 2
-
-            correct_cr = (torch.eq(rain_labels[idx_cr[:, 0:r]], clear_labels.unsqueeze(dim=-1))).any(dim=-1)
-            precise_cr = (torch.sum(correct_cr) / correct_cr.size(0)).item()
-            correct_rc = (torch.eq(clear_labels[idx_rc[:, 0:r]], rain_labels.unsqueeze(dim=-1))).any(dim=-1)
-            precise_rc = (torch.sum(correct_rc) / correct_rc.size(0)).item()
-            acc['cr@{}'.format(r)] = (precise_cr + precise_rc) / 2
-
-            correct_fr = (torch.eq(rain_labels[idx_fr[:, 0:r]], fog_labels.unsqueeze(dim=-1))).any(dim=-1)
-            precise_fr = (torch.sum(correct_fr) / correct_fr.size(0)).item()
-            correct_rf = (torch.eq(fog_labels[idx_rf[:, 0:r]], rain_labels.unsqueeze(dim=-1))).any(dim=-1)
-            precise_rf = (torch.sum(correct_rf) / correct_rf.size(0)).item()
-            acc['fr@{}'.format(r)] = (precise_fr + precise_rf) / 2
-
-            correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
-            acc['cross@{}'.format(r)] = (torch.sum(correct) / correct.size(0)).item()
-        acc['precise'] = (acc['cf@{}'.format(ranks[0])] + acc['cr@{}'.format(ranks[0])] + acc[
-            'fr@{}'.format(ranks[0])] + acc['cross@{}'.format(ranks[0])]) / 4
-    else:
-        labels = torch.arange(len(vectors) // 2, device=vectors.device)
-        labels = torch.cat((labels, labels), dim=0)
-        clear_vectors = vectors[:len(vectors) // 2]
-        depth_vectors = vectors[len(vectors) // 2:]
-        clear_labels = labels[:len(vectors) // 2]
-        depth_labels = labels[len(vectors) // 2:]
-
-        # domain clear ---> domain depth
-        sim_cd = clear_vectors.mm(depth_vectors.t())
-        idx_cd = sim_cd.topk(k=ranks[-1], dim=-1, largest=True)[1]
-        # domain depth ---> domain clear
-        sim_dc = depth_vectors.mm(clear_vectors.t())
-        idx_dc = sim_dc.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-        # cross domain
-        sim = vectors.mm(vectors.t())
-        sim.fill_diagonal_(-np.inf)
-        idx = sim.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-        acc = {}
-        for r in ranks:
-            correct_cd = (torch.eq(depth_labels[idx_cd[:, 0:r]], clear_labels.unsqueeze(dim=-1))).any(dim=-1)
-            acc['cd@{}'.format(r)] = (torch.sum(correct_cd) / correct_cd.size(0)).item()
-            correct_dc = (torch.eq(clear_labels[idx_dc[:, 0:r]], depth_labels.unsqueeze(dim=-1))).any(dim=-1)
-            acc['dc@{}'.format(r)] = (torch.sum(correct_dc) / correct_dc.size(0)).item()
-            correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
-            acc['cross@{}'.format(r)] = (torch.sum(correct) / correct.size(0)).item()
-        acc['precise'] = (acc['cd@{}'.format(ranks[0])] + acc['dc@{}'.format(ranks[0])] + acc[
-            'cross@{}'.format(ranks[0])]) / 3
+            for r in ranks:
+                correct_ab = (torch.eq(domain_b_labels[idx_ab[:, 0:r]], domain_a_labels.unsqueeze(dim=-1))).any(dim=-1)
+                acc['{}->{}@{}'.format(domains[i], domains[j], r)] = (torch.sum(correct_ab) / correct_ab.size(0)).item()
+                correct_ba = (torch.eq(domain_a_labels[idx_ba[:, 0:r]], domain_b_labels.unsqueeze(dim=-1))).any(dim=-1)
+                acc['{}->{}@{}'.format(domains[j], domains[i], r)] = (torch.sum(correct_ba) / correct_ba.size(0)).item()
+                correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
+                acc['{}<->{}@{}'.format(domains[i], domains[j], r)] = (torch.sum(correct) / correct.size(0)).item()
+    # cross all domains
+    vectors = torch.cat(domain_vectors, dim=0)
+    labels = torch.cat(domain_labels, dim=0)
+    sim = vectors.mm(vectors.t())
+    sim.fill_diagonal_(-np.inf)
+    idx = sim.topk(k=ranks[-1], dim=-1, largest=True)[1]
+    for r in ranks:
+        correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
+        acc['cross@{}'.format(r)] = (torch.sum(correct) / correct.size(0)).item()
+    # the cross recall is chosen as the representative of precise
+    acc['val_precise'] = acc['cross@{}'.format(ranks[0])]
     return acc
 
 
