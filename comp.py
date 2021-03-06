@@ -57,7 +57,7 @@ epochs = (total_iters // (len(train_data) // batch_size)) + 1
 for epoch in range(1, epochs + 1):
     model.train()
     train_bar = tqdm(train_loader, dynamic_ncols=True)
-    for img_1, img_2, pos_index in train_bar:
+    for img_1, img_2, _, _, _, pos_index in train_bar:
         img_1, img_2 = img_1.cuda(), img_2.cuda()
         _, proj_1 = model(img_1)
 

@@ -51,13 +51,19 @@ def get_transform(split='train'):
 
 
 class DomainDataset(Dataset):
-    def __init__(self, data_root, data_name, split='train'):
+    def __init__(self, data_root, domains, split='train'):
         super(DomainDataset, self).__init__()
 
-        self.data_name = data_name
-        image_path = os.path.join(data_root, data_name, split, '*', '*', '*.png')
-        self.images = glob.glob(image_path)
-        self.images.sort()
+        self.domains = domains
+        self.images, self.categories, self.labels = [], [], []
+        for i, domain in enumerate(domains):
+            images = sorted(glob.glob(os.path.join(data_root, split, domain, '*', '*.png')))
+            # which image
+            self.images += images
+            # which domain
+            self.categories += [i] * len(images)
+            # which instance
+            self.labels += range(0, len(images))
         self.transform = get_transform(split)
 
     def __getitem__(self, index):
@@ -65,10 +71,22 @@ class DomainDataset(Dataset):
         img = Image.open(img_name)
         img_1 = self.transform(img)
         img_2 = self.transform(img)
-        return img_1, img_2, index
+        category = self.categories[index]
+        label = self.labels[index]
+        return img_1, img_2, img_name, category, label, index
 
     def __len__(self):
         return len(self.images)
+
+    def refresh(self, style_num):
+        images, categories, labels = [], [], []
+        # need reverse del index to avoid the del index not exist error
+        indexes = sorted(random.sample(range(0, len(self.images)), k=style_num), reverse=True)
+        for i in indexes:
+            images.append(self.images.pop(i))
+            categories.append(self.categories.pop(i))
+            labels.append(self.labels.pop(i))
+        return images, categories, labels
 
 
 def recall(vectors, ranks, data_name):
@@ -173,11 +191,11 @@ def val_contrast(net, data_loader, results, ranks, epoch, epochs):
         for data, _, _ in tqdm(data_loader, desc='Feature extracting', dynamic_ncols=True):
             vectors.append(net(data.cuda())[0])
         vectors = torch.cat(vectors, dim=0)
-        acc = recall(vectors, ranks, data_loader.dataset.data_name)
+        acc = recall(vectors, ranks, data_loader.dataset.domains)
         precise = acc['precise']
         desc = 'Val Epoch: [{}/{}] '.format(epoch, epochs)
         for r in ranks:
-            if data_loader.dataset.data_name == 'rgb':
+            if data_loader.dataset.domains == 'rgb':
                 results['val_cf@{}'.format(r)].append(acc['cf@{}'.format(r)] * 100)
                 results['val_fr@{}'.format(r)].append(acc['fr@{}'.format(r)] * 100)
                 results['val_cr@{}'.format(r)].append(acc['cr@{}'.format(r)] * 100)
@@ -186,7 +204,7 @@ def val_contrast(net, data_loader, results, ranks, epoch, epochs):
                 results['val_cd@{}'.format(r)].append(acc['cd@{}'.format(r)] * 100)
                 results['val_dc@{}'.format(r)].append(acc['dc@{}'.format(r)] * 100)
                 results['val_cross@{}'.format(r)].append(acc['cross@{}'.format(r)] * 100)
-        if data_loader.dataset.data_name == 'rgb':
+        if data_loader.dataset.domains == 'rgb':
             desc += '| (C<->F) R@{}:{:.2f}% | '.format(ranks[0], acc['cf@{}'.format(ranks[0])] * 100)
             desc += '(F<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['fr@{}'.format(ranks[0])] * 100)
             desc += '(C<->R) R@{}:{:.2f}% | '.format(ranks[0], acc['cr@{}'.format(ranks[0])] * 100)

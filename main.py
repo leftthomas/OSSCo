@@ -70,12 +70,16 @@ if __name__ == '__main__':
     assert method_name == 'osstco', 'not support for {}'.format(method_name)
 
     # data prepare
-    train_data = DomainDataset(data_root, data_name, split='train')
-    val_data = DomainDataset(data_root, data_name, split='val')
-    train_gan_loader = DataLoader(train_data, batch_size=1, shuffle=True)
-    val_gan_loader = DataLoader(val_data, batch_size=1, shuffle=False)
-    train_contrast_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=True)
+    train_contrast_data = DomainDataset(data_root, domains, split='train')
+    train_contrast_loader = DataLoader(train_contrast_data, batch_size=batch_size, shuffle=True, num_workers=8,
+                                       drop_last=True)
+    val_data = DomainDataset(data_root, domains, split='val')
     val_contrast_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
+    val_gan_loader = DataLoader(val_data, batch_size=1, shuffle=False)
+
+    train_gan_data = DomainDataset(data_root, domains, split='train')
+    style_images, style_categories, style_labels = train_gan_data.refresh(style_num)
+    train_gan_loader = DataLoader(train_gan_data, batch_size=1, shuffle=True)
 
     # model setup
     F = Generator(4, 3).cuda()
