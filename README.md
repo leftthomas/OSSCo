@@ -49,31 +49,19 @@ acquire the details of `train/val` split. The data directory structure is shown 
 ## Usage
 
 ```
-python main.py --data_name modal --rounds 6
-optional arguments:
---data_root                   Datasets root path [default value is 'data']
---data_name                   Dataset name [default value is 'rgb'](choices=['rgb', 'modal'])
---proj_dim                    Projected feature dim for computing loss [default value is 128]
---temperature                 Temperature used in softmax [default value is 0.1]
---z_num                       Number of used styles [default value is 8]
---batch_size                  Number of images in each mini-batch for contrast stage [default value is 16]
---gan_epochs                  Number of epoch over the dataset to train gan model [default value is 1]
---contrast_epochs             Number of epoch over the dataset to train contrast model [default value is 25]
---rounds                      Number of round over the gan model and contrast model to train [default value is 4]
---ranks                       Selected recall [default value is '1,2,4,8']
---save_root                   Result saved root path [default value is 'result']
-```
-
-```
-python comp.py --data_name modal --method_name simclr
+python main.py/comp.py --data_name modal --rounds 6
 optional arguments:
 --data_root                   Datasets root path [default value is 'data']
 --data_name                   Dataset name [default value is 'rgb'](choices=['rgb', 'modal'])
 --method_name                 Method name [default value is 'simclr'](choices=['simclr', 'moco', 'npid'])
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
---batch_size                  Number of images in each mini-batch [default value is 32]
+--z_num                       Number of used styles [default value is 8]
+--batch_size                  Number of images in each mini-batch for contrast stage [default value is 16]
 --epochs                      Number of epoch over the dataset to train [default value is 200]
+--gan_epochs                  Number of epoch over the dataset to train gan model [default value is 1]
+--contrast_epochs             Number of epoch over the dataset to train contrast model [default value is 25]
+--rounds                      Number of round over the gan model and contrast model to train [default value is 4]
 --ranks                       Selected recall [default value is '1,2,4,8']
 --save_root                   Result saved root path [default value is 'result']
 --negs                        Negative sample number [default value is 4096]

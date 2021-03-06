@@ -1,3 +1,4 @@
+import argparse
 import glob
 import os
 import random
@@ -5,9 +6,31 @@ import random
 import numpy as np
 import torch
 from PIL import Image
+from torch.backends import cudnn
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from tqdm import tqdm
+
+
+def parse_common_args():
+    # for reproducibility
+    np.random.seed(1)
+    torch.manual_seed(1)
+    cudnn.deterministic = True
+    cudnn.benchmark = False
+    # common args
+    parser = argparse.ArgumentParser(description='Train Model')
+    parser.add_argument('--data_root', default='data', type=str, help='Datasets root path')
+    parser.add_argument('--method_name', default='osstco', type=str, choices=['osstco', 'simclr', 'moco', 'npid'],
+                        help='Compared method name')
+    parser.add_argument('--domains', nargs='+', type=str, required=True, help='Selected domains to train')
+    parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
+    parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
+    parser.add_argument('--batch_size', default=32, type=int, help='Number of images in each mini-batch')
+    parser.add_argument('--iters', default=40000, type=int, help='Number of bp to train')
+    parser.add_argument('--ranks', default='1,2,4,8', type=str, help='Selected recall')
+    parser.add_argument('--save_root', default='result', type=str, help='Result saved root path')
+    return parser
 
 
 def get_transform(split='train'):
@@ -142,7 +165,7 @@ def recall(vectors, ranks, data_name):
 
 
 # val for one epoch
-def val(net, data_loader, results, ranks, epoch, epochs):
+def val_contrast(net, data_loader, results, ranks, epoch, epochs):
     net.eval()
     vectors = []
     with torch.no_grad():
