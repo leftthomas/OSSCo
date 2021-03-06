@@ -19,7 +19,7 @@ conda install pytorch=1.7.1 torchvision cudatoolkit=11.0 -c pytorch
 [Weather Cityscapes](https://team.inria.fr/rits/computer-vision/weather-augment/)
 and [Cityscapes Depth](https://www.cityscapes-dataset.com)
 datasets are used in this repo, you could download these datasets from official websites, or download them from
-[MEGA](https://mega.nz/folder/kx53iYoL#u_Zc6ogPokaTRVM6qYn3ZA). The data should be rearranged, please refer the paper to
+[MEGA](https://mega.nz/folder/5sQD0QqK#zM5GfOSPvpPpfquGJd8Vjg). The data should be rearranged, please refer the paper to
 acquire the details of `train/val` split. The data directory structure is shown as follows:
 
  ```
