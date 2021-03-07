@@ -130,12 +130,10 @@ def recall(vectors, ranks, domains, categories, labels):
         correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
         acc['cross@{}'.format(r)] = (torch.sum(correct) / correct.size(0)).item()
     # the mean recall is chosen as the representative of precise
+    precise, num = 0.0, len(acc)
     for key, value in acc.items():
-        if 'val_precise' in acc:
-            acc['val_precise'] += value
-        else:
-            acc['val_precise'] = value
-    acc['val_precise'] = acc['val_precise'] / len(acc)
+        precise += value
+    acc['val_precise'] = precise / num
     return acc
 
 
