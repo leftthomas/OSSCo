@@ -1,5 +1,6 @@
 import itertools
 import os
+import random
 
 import pandas as pd
 import torch
@@ -12,7 +13,7 @@ from torchvision.utils import save_image
 from tqdm import tqdm
 
 from model import Backbone, Generator, Discriminator, OSSTCoLoss
-from utils import DomainDataset, weights_init_normal, ReplayBuffer, parse_common_args, get_transform
+from utils import DomainDataset, weights_init_normal, ReplayBuffer, parse_common_args, get_transform, val_contrast
 
 parser = parse_common_args()
 parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
@@ -165,8 +166,51 @@ for r in range(1, rounds + 1):
                             save_image(fake_style, '{}/{}'.format(save_style_path, img_name[0].split('/')[-1]))
                 F.train()
                 break
-# save models
-torch.save(F.state_dict(), '{}/{}_F.pth'.format(save_root, save_name_pre))
-torch.save(G.state_dict(), '{}/{}_G.pth'.format(save_root, save_name_pre))
-for i, D in enumerate(Ds):
-    torch.save(D.state_dict(), '{}/{}_D{}.pth'.format(save_root, save_name_pre, i))
+    # contrast training loop
+    F.eval()
+    for epoch in range(1, contrast_epochs + 1):
+        backbone.train()
+        train_bar = tqdm(train_contrast_loader, dynamic_ncols=True)
+        for img_1, img_2, _, _, _, pos_index in train_bar:
+            img_1, img_2 = img_1.cuda(), img_2.cuda()
+            _, proj_1 = backbone(img_1)
+            _, proj_2 = backbone(img_2)
+            with torch.no_grad():
+                i = random.randint(0, style_num - 1)
+                code = style_codes[i].view(1, style_num, 1, 1).cuda()
+                code = code.expand(1, style_num, *img_1.size()[-2:])
+                img_3 = F(torch.cat((code, img_1), dim=1))
+            _, proj_3 = backbone(img_3)
+            loss = criterion_contrast(proj_1, proj_2, proj_3)
+            optimizer_backbone.zero_grad()
+            loss.backward()
+            optimizer_backbone.step()
+            current_contrast_iter += 1
+            total_contrast_loss += loss.item()
+            train_bar.set_description(
+                'Train Iter: [{}/{}] Contrast Loss: {:.4f}'
+                    .format(current_contrast_iter + contrast_iter * r, contrast_iter * rounds,
+                            total_contrast_loss / (current_contrast_iter + contrast_iter * r)))
+            if current_contrast_iter % 100 == 0:
+                results['train_contrast_loss'].append(total_contrast_loss / (current_contrast_iter + contrast_iter * r))
+            # every 100 iters to val the model
+            val_precise, features = val_contrast(backbone, val_contrast_loader, results, ranks,
+                                                 current_contrast_iter + contrast_iter * r, contrast_iter * rounds)
+            # save statistics
+            data_frame = pd.DataFrame(data=results,
+                                      index=range(1, (current_contrast_iter + contrast_iter * r) // 100 + 1))
+            data_frame.to_csv('{}/{}_results.csv'.format(save_root, save_name_pre), index_label='iter')
+
+            if val_precise > best_precise:
+                best_precise = val_precise
+            # save models
+            torch.save(backbone.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
+            torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
+            torch.save(F.state_dict(), '{}/{}_F.pth'.format(save_root, save_name_pre))
+            torch.save(G.state_dict(), '{}/{}_G.pth'.format(save_root, save_name_pre))
+            for i, D in enumerate(Ds):
+                torch.save(D.state_dict(), '{}/{}_D{}.pth'.format(save_root, save_name_pre, i))
+            # stop iter data when arriving the total bp numbers
+            if current_contrast_iter + contrast_iter * r == total_iter:
+                break
+    F.train()
