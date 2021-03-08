@@ -176,6 +176,11 @@ for r in range(1, rounds + 1):
                                 os.makedirs(os.path.dirname(img_path))
                             save_image(fake_style, img_path)
                 F.train()
+                # save models
+                torch.save(F.state_dict(), '{}/{}_round-{}_F.pth'.format(save_root, save_name_pre, r))
+                torch.save(G.state_dict(), '{}/{}_round-{}_G.pth'.format(save_root, save_name_pre, r))
+                for i, D in enumerate(Ds):
+                    torch.save(D.state_dict(), '{}/{}_round-{}_D{}.pth'.format(save_root, save_name_pre, r, i + 1))
                 break
     # contrast training loop
     F.eval()
@@ -215,13 +220,8 @@ for r in range(1, rounds + 1):
 
                 if val_precise > best_precise:
                     best_precise = val_precise
-                # save models
-                torch.save(backbone.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
-                torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
-                torch.save(F.state_dict(), '{}/{}_F.pth'.format(save_root, save_name_pre))
-                torch.save(G.state_dict(), '{}/{}_G.pth'.format(save_root, save_name_pre))
-                for i, D in enumerate(Ds):
-                    torch.save(D.state_dict(), '{}/{}_D{}.pth'.format(save_root, save_name_pre, i + 1))
+                    torch.save(backbone.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
+                    torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
             # stop iter data when arriving the contrast bp numbers
             if current_contrast_iter == contrast_iter:
                 break
