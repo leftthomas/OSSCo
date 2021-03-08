@@ -198,31 +198,31 @@ for r in range(1, rounds + 1):
             optimizer_backbone.step()
             current_contrast_iter += 1
             total_contrast_loss += loss.item()
-            train_bar.set_description(
-                'Train Iter: [{}/{}] Contrast Loss: {:.4f}'
-                    .format(current_contrast_iter + contrast_iter * r, contrast_iter * rounds,
-                            total_contrast_loss / (current_contrast_iter + contrast_iter * r)))
+            train_bar.set_description('Train Iter: [{}/{}] Contrast Loss: {:.4f}'
+                                      .format(current_contrast_iter + contrast_iter * (r - 1), contrast_iter * rounds,
+                                              total_contrast_loss / (current_contrast_iter + contrast_iter * (r - 1))))
             if current_contrast_iter % 100 == 0:
-                gan_results['train_contrast_loss'].append(
-                    total_contrast_loss / (current_contrast_iter + contrast_iter * r))
-            # every 100 iters to val the model
-            val_precise, features = val_contrast(backbone, val_contrast_loader, gan_results, ranks,
-                                                 current_contrast_iter + contrast_iter * r, contrast_iter * rounds)
-            # save statistics
-            data_frame = pd.DataFrame(data=gan_results,
-                                      index=range(1, (current_contrast_iter + contrast_iter * r) // 100 + 1))
-            data_frame.to_csv('{}/{}_results.csv'.format(save_root, save_name_pre), index_label='iter')
+                contrast_results['train_loss'].append(
+                    total_contrast_loss / (current_contrast_iter + contrast_iter * (r - 1)))
+                # every 100 iters to val the model
+                val_precise, features = val_contrast(backbone, val_contrast_loader, contrast_results,
+                                                     ranks, current_contrast_iter + contrast_iter * (r - 1),
+                                                     contrast_iter * rounds)
+                # save statistics
+                data_frame = pd.DataFrame(data=contrast_results,
+                                          index=range(1, (current_contrast_iter + contrast_iter * (r - 1)) // 100 + 1))
+                data_frame.to_csv('{}/{}_results.csv'.format(save_root, save_name_pre), index_label='iter')
 
-            if val_precise > best_precise:
-                best_precise = val_precise
-            # save models
-            torch.save(backbone.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
-            torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
-            torch.save(F.state_dict(), '{}/{}_F.pth'.format(save_root, save_name_pre))
-            torch.save(G.state_dict(), '{}/{}_G.pth'.format(save_root, save_name_pre))
-            for i, D in enumerate(Ds):
-                torch.save(D.state_dict(), '{}/{}_D{}.pth'.format(save_root, save_name_pre, i))
-            # stop iter data when arriving the total bp numbers
-            if current_contrast_iter + contrast_iter * r == total_iter:
+                if val_precise > best_precise:
+                    best_precise = val_precise
+                # save models
+                torch.save(backbone.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
+                torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
+                torch.save(F.state_dict(), '{}/{}_F.pth'.format(save_root, save_name_pre))
+                torch.save(G.state_dict(), '{}/{}_G.pth'.format(save_root, save_name_pre))
+                for i, D in enumerate(Ds):
+                    torch.save(D.state_dict(), '{}/{}_D{}.pth'.format(save_root, save_name_pre, i + 1))
+            # stop iter data when arriving the contrast bp numbers
+            if current_contrast_iter == contrast_iter:
                 break
     F.train()
