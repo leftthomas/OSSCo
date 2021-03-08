@@ -62,7 +62,7 @@ criterion_contrast = OSSTCoLoss(temperature)
 
 gan_results = {'train_fg_loss': [], 'train_ds_loss': []}
 contrast_results = {'train_loss': [], 'val_precise': []}
-save_name_pre = '{}_{}'.format(domains, method_name)
+save_name_pre = '{}_{}_{}_{}_{}'.format(domains, method_name, style_num, gan_iter, contrast_iter)
 if not os.path.exists(save_root):
     os.makedirs(save_root)
 best_precise, total_fg_loss, total_ds_loss, total_contrast_loss = 0.0, 0.0, 0.0, 0.0
@@ -155,7 +155,7 @@ for r in range(1, rounds + 1):
                     for style, category in zip(style_images, style_categories):
                         domain = domains[category]
                         name = os.path.basename(style)
-                        style_path = '{}/round-{}/{}_{}'.format(save_root, r, domain, name)
+                        style_path = '{}/{}/round-{}/{}_{}'.format(save_root, save_name_pre, r, domain, name)
                         if not os.path.exists(os.path.dirname(style_path)):
                             os.makedirs(os.path.dirname(style_path))
                         Image.open(style).save(style_path)
@@ -169,9 +169,9 @@ for r in range(1, rounds + 1):
                             name = os.path.basename(img_name[0])
                             style_code = style_code.view(1, style_num, 1, 1).cuda()
                             style_code = style_code.expand(1, style_num, *img.size()[-2:])
-                            fake_style = (F(torch.cat((style_code, img), dim=1)) + 1.0) / 2
-                            img_path = '{}/round-{}/{}_{}/{}_{}'.format(save_root, r, style_domain,
-                                                                        style_name.split('.')[0], domain, name)
+                            fake_style = (F(torch.cat((style_code, img.cuda()), dim=1)) + 1.0) / 2
+                            img_path = '{}/{}/round-{}/{}_{}/{}_{}'.format(save_root, save_name_pre, r, style_domain,
+                                                                           style_name.split('.')[0], domain, name)
                             if not os.path.exists(os.path.dirname(img_path)):
                                 os.makedirs(os.path.dirname(img_path))
                             save_image(fake_style, img_path)
