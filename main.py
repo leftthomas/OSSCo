@@ -3,152 +3,170 @@ import os
 
 import pandas as pd
 import torch
-from torch.nn.functional import mse_loss
+from PIL import Image
+from torch.nn.functional import one_hot
 from torch.optim import Adam
+from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data.dataloader import DataLoader
+from torchvision.utils import save_image
 from tqdm import tqdm
 
 from model import Backbone, Generator, Discriminator, OSSTCoLoss
-from utils import DomainDataset, val_contrast, weights_init_normal, ReplayBuffer, parse_common_args
+from utils import DomainDataset, weights_init_normal, ReplayBuffer, parse_common_args, get_transform
 
+parser = parse_common_args()
+parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
+parser.add_argument('--gan_iter', default=4000, type=int, help='Number of bp to train gan model')
+parser.add_argument('--contrast_iter', default=4000, type=int, help='Number of bp to train contrast model')
 
-# train for one epoch
-def train(net, data_loader, train_optimizer):
-    net.train()
-    F.train()
-    G.train()
-    Ds.train()
-    D_style.train()
-    total_loss, total_num, train_bar = 0.0, 0, tqdm(data_loader, dynamic_ncols=True)
-    for ori_img_1, ori_img_2, pos_index in train_bar:
-        ori_img_1, ori_img_2 = ori_img_1.cuda(), ori_img_2.cuda()
-        # synthetic domain images
-        content = F(ori_img_1)
-        # shuffle style
-        idx = torch.randperm(batch_size, device=ori_img_1.device)
-        style = G(ori_img_1[idx])
-        sytic = content + style
+# args parse
+args = parser.parse_args()
+data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
+temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
+style_num, gan_iter, contrast_iter = args.style_num, args.gan_iter, args.contrast_iter
+ranks, save_root, rounds = args.ranks, args.save_root, total_iter // (gan_iter + contrast_iter)
+# asserts
+assert total_iter % (gan_iter + contrast_iter) == 0, \
+    'make sure the gan_iter + contrast_iter can be divided by total_iter'
+assert method_name == 'osstco', 'not support for {}'.format(method_name)
 
-        _, ori_proj_1 = net(ori_img_1)
-        # UMDA
-        _, ori_proj_2 = net(sytic)
-        sim_loss = criterion_contrast(ori_proj_1, ori_proj_2)
-        content_loss = mse_loss(Ds(content), Ds(sytic))
-        style_loss = mse_loss(D_style(style), D_style(sytic))
-        loss = 10 * sim_loss + content_loss + style_loss
+# data prepare
+train_contrast_data = DomainDataset(data_root, domains, split='train')
+train_contrast_loader = DataLoader(train_contrast_data, batch_size=batch_size, shuffle=True, num_workers=8,
+                                   drop_last=True)
+val_data = DomainDataset(data_root, domains, split='val')
+val_contrast_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
+val_gan_loader = DataLoader(val_data, batch_size=1, shuffle=False)
 
-        optimizer_FG.zero_grad()
-        optimizer_D.zero_grad()
-        train_optimizer.zero_grad()
-        loss.backward()
-        train_optimizer.step()
-        optimizer_FG.step()
-        optimizer_D.step()
+# model setup
+F = Generator(3 + style_num, 3).cuda()
+G = Generator(3 + style_num, 3).cuda()
+Ds = [Discriminator(3).cuda() for _ in range(style_num)]
+F.apply(weights_init_normal)
+G.apply(weights_init_normal)
+for D in Ds:
+    D.apply(weights_init_normal)
+backbone = Backbone(proj_dim).cuda()
 
-        total_num += batch_size
-        total_loss += loss.item() * batch_size
-        train_bar.set_description('Train Epoch: [{}/{}] Loss: {:.4f}'.format(epoch, gan_epochs, total_loss / total_num))
+# optimizer config
+optimizer_FG = Adam(itertools.chain(F.parameters(), G.parameters()), lr=2e-4, betas=(0.5, 0.999))
+optimizer_Ds = [Adam(D.parameters(), lr=2e-4, betas=(0.5, 0.999)) for D in Ds]
+optimizer_backbone = Adam(backbone.parameters(), lr=1e-3, weight_decay=1e-6)
 
-    return total_loss / total_num
+# loss setup
+criterion_adversarial = torch.nn.MSELoss()
+criterion_cycle = torch.nn.L1Loss()
+criterion_identity = torch.nn.L1Loss()
+criterion_contrast = OSSTCoLoss(temperature)
 
+results = {'train_fg_loss': [], 'train_ds_loss': [], 'train_contrast_loss': [], 'val_precise': []}
+save_name_pre = '{}_{}'.format(domains, method_name)
+if not os.path.exists(save_root):
+    os.makedirs(save_root)
+best_precise, total_fg_loss, total_ds_loss, total_contrast_loss = 0.0, 0.0, 0.0, 0.0
 
-if __name__ == '__main__':
-    parser = parse_common_args()
-    parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
-    parser.add_argument('--gan_iter', default=4000, type=int, help='Number of bp to train gan model')
-    parser.add_argument('--contrast_iter', default=4000, type=int, help='Number of bp to train contrast model')
-
-    # args parse
-    args = parser.parse_args()
-    data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
-    temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
-    style_num, gan_iter, contrast_iter = args.style_num, args.gan_iter, args.contrast_iter
-    ranks, save_root, rounds = args.ranks, args.save_root, total_iter // (gan_iter + contrast_iter)
-    # asserts
-    assert total_iter % (gan_iter + contrast_iter) == 0, \
-        'make sure the gan_iter + contrast_iter can be divided by total_iter'
-    assert method_name == 'osstco', 'not support for {}'.format(method_name)
-
-    # data prepare
-    train_contrast_data = DomainDataset(data_root, domains, split='train')
-    train_contrast_loader = DataLoader(train_contrast_data, batch_size=batch_size, shuffle=True, num_workers=8,
-                                       drop_last=True)
-    val_data = DomainDataset(data_root, domains, split='val')
-    val_contrast_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
-    val_gan_loader = DataLoader(val_data, batch_size=1, shuffle=False)
-
+# training loop
+for r in range(1, rounds + 1):
+    # each round should refresh style images
     train_gan_data = DomainDataset(data_root, domains, split='train')
     style_images, style_categories, style_labels = train_gan_data.refresh(style_num)
+    style_codes = one_hot(torch.arange(0, style_num), style_num).float()
     train_gan_loader = DataLoader(train_gan_data, batch_size=1, shuffle=True)
 
-    # model setup
-    F = Generator(4, 3).cuda()
-    G = Generator(4, 3).cuda()
-    Ds = [Discriminator(3).cuda() for _ in range(z_num)]
-    F.apply(weights_init_normal)
-    G.apply(weights_init_normal)
-    for D in Ds:
-        D.apply(weights_init_normal)
-    backbone = Backbone(proj_dim).cuda()
+    fake_style_buffer = [ReplayBuffer() for _ in range(style_num)]
+    gan_epochs = (gan_iter // len(train_gan_data)) + 1
+    contrast_epochs = (contrast_iter // (len(train_contrast_data) // batch_size)) + 1
+    lr_scheduler_FG = LambdaLR(optimizer_FG,
+                               lr_lambda=lambda eiter: 1.0 - max(0, eiter - gan_iter // 2) / float(gan_iter // 2))
+    lr_scheduler_Ds = [LambdaLR(optimizer_D,
+                                lr_lambda=lambda eiter: 1.0 - max(0, eiter - gan_iter // 2) / float(gan_iter // 2))
+                       for optimizer_D in optimizer_Ds]
+    current_gan_iter, current_contrast_iter = 0, 0
 
-    # optimizer config
-    optimizer_backbone = Adam(backbone.parameters(), lr=1e-3, weight_decay=1e-6)
-    optimizer_FG = Adam(itertools.chain(F.parameters(), G.parameters()), lr=2e-4, betas=(0.5, 0.999))
-    optimizer_Ds = [Adam(D.parameters(), lr=2e-4, betas=(0.5, 0.999)) for D in Ds]
-
-    # loss setup
-    criterion_adversarial = torch.nn.MSELoss()
-    criterion_cycle = torch.nn.L1Loss()
-    criterion_identity = torch.nn.L1Loss()
-    criterion_contrast = OSSTCoLoss(temperature)
-
-    # training loop
-    gan_results = {'train_fg_loss': []}
-    for i in range(z_num):
-        gan_results['train_d{}_loss'.format(str(i + 1))] = []
-    contrast_results = {'train_loss': [], 'val_precise': []}
-    for rank in ranks:
-        if data_name == 'rgb':
-            contrast_results['val_cf@{}'.format(rank)] = []
-            contrast_results['val_fr@{}'.format(rank)] = []
-            contrast_results['val_cr@{}'.format(rank)] = []
-            contrast_results['val_cross@{}'.format(rank)] = []
-        else:
-            contrast_results['val_cd@{}'.format(rank)] = []
-            contrast_results['val_dc@{}'.format(rank)] = []
-            contrast_results['val_cross@{}'.format(rank)] = []
-    save_name_pre = '{}_osstco'.format(data_name)
-    if not os.path.exists(save_root):
-        os.makedirs(save_root)
-
-    for i in range(rounds):
-        # gan training loop
-        fake_buffers = [ReplayBuffer() for _ in range(z_num)]
-        for epoch in range(1, gan_epochs + 1):
-            g_loss, da_loss, db_loss = train(G_A, G_B, Ds, train_loader, optimizer_G, optimizer_Ds)
-            results['train_fg_loss'].append(g_loss)
-            results['train_da_loss'].append(da_loss)
-            results['train_db_loss'].append(db_loss)
-            val_contrast(G_A, G_B, test_loader)
-            # save statistics
-            data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
-            data_frame.to_csv('{}/results.csv'.format(save_root), index_label='epoch')
-            torch.save(G_A.state_dict(), '{}/GA.pth'.format(save_root))
-            torch.save(G_B.state_dict(), '{}/GB.pth'.format(save_root))
-            torch.save(D_A.state_dict(), '{}/DA.pth'.format(save_root))
-            torch.save(D_B.state_dict(), '{}/DB.pth'.format(save_root))
-
-        best_precise = 0.0
-        for epoch in range(1, gan_epochs + 1):
-            train_loss = train(backbone, train_gan_loader, optimizer_backbone)
-            contrast_results['train_loss'].append(train_loss)
-            val_precise, features = val_contrast(backbone, val_gan_loader, contrast_results, ranks, epoch, gan_epochs)
-            contrast_results['val_precise'].append(val_precise * 100)
-            # save statistics
-            data_frame = pd.DataFrame(data=contrast_results, index=range(1, epoch + 1))
-            data_frame.to_csv('{}/{}_results.csv'.format(save_root, save_name_pre), index_label='epoch')
-
-            if val_precise > best_precise:
-                best_precise = val_precise
-                torch.save(backbone.state_dict(), '{}/{}_model.pth'.format(save_root, save_name_pre))
-                torch.save(features, '{}/{}_vectors.pth'.format(save_root, save_name_pre))
+    # GAN training loop
+    for epoch in range(1, gan_epochs + 1):
+        F.train()
+        G.train()
+        for D in Ds:
+            D.train()
+        train_bar = tqdm(train_gan_loader, dynamic_ncols=True)
+        for content, _, _, _, _, _ in train_bar:
+            content = content.cuda()
+            styles = [get_transform('train')(Image.open(style)).cuda() for style in style_images]
+            # F and G
+            optimizer_FG.zero_grad()
+            fake_styles = []
+            for i, code in enumerate(style_codes):
+                code = code.view(1, style_num, 1, 1).cuda()
+                code = code.expand(1, style_num, *content.size()[-2:])
+                fake_style = F(torch.cat((code, content), dim=1))
+                fake_styles.append(fake_style)
+                pred_fake_style = Ds[i](fake_style)
+                # adversarial loss
+                target_fake_style = torch.ones(pred_fake_style.size(), device=pred_fake_style.device)
+                adversarial_loss = criterion_adversarial(pred_fake_style, target_fake_style)
+                # cycle loss
+                cycle_loss = criterion_cycle(G(torch.cat((code, fake_style), dim=1)), content)
+                # identity loss
+                identity_loss = criterion_identity(F(torch.cat((code, styles[i]), dim=1)), styles[i]) \
+                                + criterion_identity(G(torch.cat((code, content), dim=1)), content)
+                fg_loss = (adversarial_loss + 10 * cycle_loss + 5 * identity_loss) / style_num
+                fg_loss.backward()
+                total_fg_loss += fg_loss.item()
+            optimizer_FG.step()
+            # Ds
+            for i, D in enumerate(Ds):
+                optimizer_Ds[i].zero_grad()
+                pred_real_style = D(styles[i])
+                target_real_style = torch.ones(pred_real_style.size(), device=pred_real_style.device)
+                fake_style = fake_style_buffer[i].push_and_pop(fake_styles[i])
+                pred_fake_style = D(fake_style)
+                target_fake_style = torch.zeros(pred_fake_style.size(), device=pred_fake_style.device)
+                adversarial_loss = (criterion_adversarial(pred_real_style, target_real_style)
+                                    + criterion_adversarial(pred_fake_style, target_fake_style)) / 2
+                adversarial_loss.backward()
+                optimizer_Ds[i].step()
+                total_ds_loss += adversarial_loss.item() / style_num
+            current_gan_iter += 1
+            lr_scheduler_FG.step()
+            for lr_scheduler_D in lr_scheduler_Ds:
+                lr_scheduler_D.step()
+            train_bar.set_description('Train Iter: [{}/{}] FG Loss: {:.4f}, Ds Loss: {:.4f}'
+                                      .format(current_gan_iter + gan_iter * r, gan_iter * rounds,
+                                              total_fg_loss / (current_gan_iter + gan_iter * r),
+                                              total_ds_loss / (current_gan_iter + gan_iter * r)))
+            if current_gan_iter % 100 == 0:
+                results['train_fg_loss'].append(total_fg_loss / (current_gan_iter + gan_iter * r))
+                results['train_ds_loss'].append(total_ds_loss / (current_gan_iter + gan_iter * r))
+                # save statistics
+                data_frame = pd.DataFrame(data=results, index=range(1, (current_gan_iter + gan_iter * r) // 100 + 1))
+                data_frame.to_csv('{}/{}_gan_results.csv'.format(save_root, save_name_pre), index_label='iter')
+            # stop iter data when arriving the gan bp numbers
+            if current_gan_iter == gan_iter:
+                # save the generated images for val data by using this round model and styles
+                F.eval()
+                with torch.no_grad():
+                    for i, style in enumerate(style_images):
+                        domain = style_categories[i]
+                        name = style.split('/')[-1].split('.')[0]
+                        style_path = '{}/round-{}/{}_{}_{}.png'.format(save_root, r, i + 1, domain, name)
+                        if not os.path.exists(os.path.dirname(save_style_path)):
+                            os.makedirs(os.path.dirname(save_style_path))
+                        Image.open(style).save(style_path)
+                    for img, _, img_name, category, label, _ in tqdm(val_gan_loader, desc='Saving generated images',
+                                                                     dynamic_ncols=True):
+                        for i, code in enumerate(style_codes):
+                            code = code.view(1, style_num, 1, 1).cuda()
+                            code = code.expand(1, style_num, *img.size()[-2:])
+                            fake_style = (F(torch.cat((code, img), dim=1)) + 1.0) / 2
+                            save_style_path = '{}/round-{}/{}'.format(save_root, r, i + 1)
+                            if not os.path.exists(save_style_path):
+                                os.makedirs(save_style_path)
+                            save_image(fake_style, '{}/{}'.format(save_style_path, img_name[0].split('/')[-1]))
+                F.train()
+                break
+# save models
+torch.save(F.state_dict(), '{}/{}_F.pth'.format(save_root, save_name_pre))
+torch.save(G.state_dict(), '{}/{}_G.pth'.format(save_root, save_name_pre))
+for i, D in enumerate(Ds):
+    torch.save(D.state_dict(), '{}/{}_D{}.pth'.format(save_root, save_name_pre, i))
