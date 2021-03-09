@@ -194,7 +194,7 @@ for r in range(1, rounds + 1):
             with torch.no_grad():
                 i = random.randint(0, style_num - 1)
                 code = style_codes[i].view(1, style_num, 1, 1).cuda()
-                code = code.expand(1, style_num, *img_1.size()[-2:])
+                code = code.expand(batch_size, style_num, *img_1.size()[-2:])
                 img_3 = F(torch.cat((code, img_1), dim=1))
             _, proj_3 = backbone(img_3)
             loss = criterion_contrast(proj_1, proj_2, proj_3)
