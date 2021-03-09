@@ -57,13 +57,13 @@ optional arguments:
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
 --batch_size                  Number of images in each mini-batch [default value is 16]
---total_iter                  Number of bp to train [default value is 40000]
+--total_iter                  Number of bp to train [default value is 10000]
 --ranks                       Selected recall to val [default value is [1, 2, 4, 8]]
 --save_root                   Result saved root path [default value is 'result']
 # args for osstco
 --style_num                   Number of used styles [default value is 8]
---gan_iter                    Number of bp to train gan model [default value is 4000]
---contrast_iter               Number of bp to train contrast model [default value is 4000]
+--gan_iter                    Number of bp to train gan model [default value is 1000]
+--contrast_iter               Number of bp to train contrast model [default value is 1000]
 # args for moco and npid
 --negs                        Negative sample number [default value is 4096]
 --momentum                    Momentum used for the update of memory bank or shadow model [default value is 0.5]

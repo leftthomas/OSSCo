@@ -17,8 +17,8 @@ from utils import DomainDataset, weights_init_normal, ReplayBuffer, parse_common
 
 parser = parse_common_args()
 parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
-parser.add_argument('--gan_iter', default=4000, type=int, help='Number of bp to train gan model')
-parser.add_argument('--contrast_iter', default=4000, type=int, help='Number of bp to train contrast model')
+parser.add_argument('--gan_iter', default=1000, type=int, help='Number of bp to train gan model')
+parser.add_argument('--contrast_iter', default=1000, type=int, help='Number of bp to train contrast model')
 
 # args parse
 args = parser.parse_args()

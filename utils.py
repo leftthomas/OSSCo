@@ -28,7 +28,7 @@ def parse_common_args():
     parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
     parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
     parser.add_argument('--batch_size', default=16, type=int, help='Number of images in each mini-batch')
-    parser.add_argument('--total_iter', default=40000, type=int, help='Number of bp to train')
+    parser.add_argument('--total_iter', default=10000, type=int, help='Number of bp to train')
     parser.add_argument('--ranks', nargs='+', default=[1, 2, 4, 8], type=int, help='Selected recall to val')
     parser.add_argument('--save_root', default='result', type=str, help='Result saved root path')
     return parser
