@@ -24,7 +24,7 @@ parser.add_argument('--rounds', default=5, type=int, help='Number of round to tr
 args = parser.parse_args()
 data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
 temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
-style_num, gan_iter, contcrast_iter = args.style_num, args.gan_iter, args.total_iter
+style_num, gan_iter, contrast_iter = args.style_num, args.gan_iter, args.total_iter
 ranks, save_root, rounds = args.ranks, args.save_root, args.rounds
 # asserts
 assert method_name == 'osstco', 'not support for {}'.format(method_name)
