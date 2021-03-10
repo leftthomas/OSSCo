@@ -60,7 +60,7 @@ criterion_contrast = OSSTCoLoss(temperature)
 
 gan_results = {'train_fg_loss': [], 'train_ds_loss': []}
 contrast_results = {'train_loss': [], 'val_precise': []}
-save_name_pre = '{}_{}_{}_{}_{}'.format(domains, method_name, style_num, gan_iter, contrast_iter)
+save_name_pre = '{}_{}_{}_{}_{}'.format(domains, method_name, style_num, rounds, gan_iter)
 if not os.path.exists(save_root):
     os.makedirs(save_root)
 best_precise, total_fg_loss, total_ds_loss, total_contrast_loss = 0.0, 0.0, 0.0, 0.0
