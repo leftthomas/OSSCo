@@ -6,14 +6,14 @@ from torch.optim import Adam
 from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 
-from model import Backbone, SimCLRLoss, MoCoLoss, NPIDLoss
+from model import Backbone, SimCLRLoss, NPIDLoss
 from utils import DomainDataset, val_contrast, parse_common_args
 
 parser = parse_common_args()
 # args for MoCo and NPID
 parser.add_argument('--negs', default=4096, type=int, help='Negative sample number')
 parser.add_argument('--momentum', default=0.5, type=float,
-                    help='Momentum used for the update of memory bank or shadow model')
+                    help='Momentum used for the update of memory bank')
 
 # args parse
 args = parser.parse_args()

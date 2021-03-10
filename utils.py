@@ -21,10 +21,10 @@ def parse_common_args():
     # common args
     parser = argparse.ArgumentParser(description='Train Model')
     parser.add_argument('--data_root', default='data', type=str, help='Datasets root path')
-    parser.add_argument('--method_name', default='osstco', type=str, choices=['osstco', 'simclr', 'moco', 'npid'],
+    parser.add_argument('--data_name', default='cityscapes', type=str, choices=['cityscapes', 'cufsf'],
+                        help='Dataset name')
+    parser.add_argument('--method_name', default='ossco', type=str, choices=['ossco', 'simclr', 'npid'],
                         help='Compared method name')
-    parser.add_argument('--domains', nargs='+', default=['clear', 'fog', 'rain'], type=str,
-                        help='Selected domains to train')
     parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
     parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
     parser.add_argument('--batch_size', default=16, type=int, help='Number of images in each mini-batch')
@@ -51,10 +51,10 @@ def get_transform(split='train'):
 
 
 class DomainDataset(Dataset):
-    def __init__(self, data_root, domains, split='train'):
+    def __init__(self, data_root, data_name, split='train'):
         super(DomainDataset, self).__init__()
 
-        self.domains = domains
+        self.data_name = data_name
         self.images, self.categories, self.labels = [], [], []
         for i, domain in enumerate(domains):
             images = sorted(glob.glob(os.path.join(data_root, split, domain, '*', '*.png')))
@@ -185,3 +185,4 @@ def weights_init_normal(m):
     if classname.find('Conv') != -1:
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
         torch.nn.init.constant_(m.bias, 0.0)
+

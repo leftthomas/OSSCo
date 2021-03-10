@@ -139,30 +139,6 @@ class SimCLRLoss(nn.Module):
         return loss
 
 
-class MoCoLoss(nn.Module):
-    def __init__(self, negs, proj_dim, temperature):
-        super(MoCoLoss, self).__init__()
-        # init memory queue as unit random vector ---> [Negs, Dim]
-        self.register_buffer('queue', F.normalize(torch.randn(negs, proj_dim), dim=-1))
-        self.temperature = temperature
-
-    def forward(self, query, key):
-        batch_size = query.size(0)
-        # [B, 1]
-        score_pos = torch.sum(query * key, dim=-1, keepdim=True)
-        # [B, Negs]
-        score_neg = torch.mm(query, self.queue.t().contiguous())
-        # [B, 1+Negs]
-        out = torch.cat([score_pos, score_neg], dim=-1)
-        # compute loss
-        loss = F.cross_entropy(out / self.temperature, torch.zeros(batch_size, dtype=torch.long, device=query.device))
-        return loss
-
-    def enqueue(self, key):
-        # update queue
-        self.queue.copy_(torch.cat((self.queue, key), dim=0)[key.size(0):])
-
-
 class NPIDLoss(nn.Module):
     def __init__(self, n, negs, proj_dim, momentum, temperature):
         super(NPIDLoss, self).__init__()
