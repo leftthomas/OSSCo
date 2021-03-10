@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.models.resnet import resnet50
+from torchvision.models import resnet50
 
 
 class ResidualBlock(nn.Module):

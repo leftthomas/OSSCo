@@ -55,7 +55,7 @@ optimizer_backbone = Adam(backbone.parameters(), lr=1e-3, weight_decay=1e-6)
 # loss setup
 criterion_adversarial = torch.nn.MSELoss()
 criterion_cycle = torch.nn.L1Loss()
-criterion_perceptual = torch.nn.L1Loss()
+criterion_identity = torch.nn.L1Loss()
 criterion_contrast = OSSTCoLoss(temperature)
 
 gan_results = {'train_fg_loss': [], 'train_ds_loss': []}
@@ -107,9 +107,10 @@ for r in range(1, rounds + 1):
                 adversarial_loss = criterion_adversarial(pred_fake_style, target_fake_style)
                 # cycle loss
                 cycle_loss = criterion_cycle(G(torch.cat((code, fake_style), dim=1)), content)
-                # perceptual loss
-                perceptual_loss = criterion_perceptual(G(torch.cat((code, content), dim=1)), content)
-                fg_loss = (adversarial_loss + 10 * cycle_loss + 5 * perceptual_loss)
+                # identity loss
+                identity_loss = criterion_identity(F(torch.cat((code, style), dim=1)), style) \
+                                + criterion_identity(G(torch.cat((code, content), dim=1)), content)
+                fg_loss = (adversarial_loss + 10 * cycle_loss + 2.5 * identity_loss)
                 fg_loss.backward()
                 optimizer_FG.step()
                 total_fg_loss += fg_loss.item() / style_num
@@ -120,7 +121,7 @@ for r in range(1, rounds + 1):
                 fake_style = fake_buffer.push_and_pop(fake_style)
                 pred_fake_style = D(fake_style)
                 adversarial_loss = (criterion_adversarial(pred_real_style, target_real_style)
-                                    + criterion_adversarial(pred_fake_style, target_fake_style)) / 4
+                                    + criterion_adversarial(pred_fake_style, target_fake_style)) / 2
                 adversarial_loss.backward()
                 optimizer_D.step()
                 lr_scheduler_D.step()

@@ -186,4 +186,3 @@ def weights_init_normal(m):
     if classname.find('Conv') != -1:
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
         torch.nn.init.constant_(m.bias, 0.0)
-
