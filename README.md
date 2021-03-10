@@ -62,8 +62,8 @@ optional arguments:
 --save_root                   Result saved root path [default value is 'result']
 # args for osstco
 --style_num                   Number of used styles [default value is 8]
---gan_iter                    Number of bp to train gan model [default value is 2000]
---contrast_iter               Number of bp to train contrast model [default value is 2000]
+--gan_iter                    Number of bp to train gan model [default value is 4000]
+--rounds                      Number of round to train whole model [default value is 5]
 # args for moco and npid
 --negs                        Negative sample number [default value is 4096]
 --momentum                    Momentum used for the update of memory bank or shadow model [default value is 0.5]

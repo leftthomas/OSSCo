@@ -17,17 +17,16 @@ from utils import DomainDataset, weights_init_normal, ReplayBuffer, parse_common
 
 parser = parse_common_args()
 parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
-parser.add_argument('--gan_iter', default=2000, type=int, help='Number of bp to train gan model')
-parser.add_argument('--contrast_iter', default=2000, type=int, help='Number of bp to train contrast model')
+parser.add_argument('--gan_iter', default=4000, type=int, help='Number of bp to train gan model')
+parser.add_argument('--rounds', default=5, type=int, help='Number of round to train whole model')
 
 # args parse
 args = parser.parse_args()
 data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
 temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
-style_num, gan_iter, contrast_iter = args.style_num, args.gan_iter, args.contrast_iter
-ranks, save_root, rounds = args.ranks, args.save_root, total_iter // contrast_iter
+style_num, gan_iter, contcrast_iter = args.style_num, args.gan_iter, args.total_iter
+ranks, save_root, rounds = args.ranks, args.save_root, args.rounds
 # asserts
-assert total_iter % contrast_iter == 0, 'make sure the contrast_iter can be divided by total_iter'
 assert method_name == 'osstco', 'not support for {}'.format(method_name)
 
 # data prepare
