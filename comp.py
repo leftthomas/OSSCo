@@ -10,20 +10,19 @@ from model import Backbone, SimCLRLoss, NPIDLoss
 from utils import DomainDataset, val_contrast, parse_common_args
 
 parser = parse_common_args()
-# args for MoCo and NPID
+# args for NPID
 parser.add_argument('--negs', default=4096, type=int, help='Negative sample number')
-parser.add_argument('--momentum', default=0.5, type=float,
-                    help='Momentum used for the update of memory bank')
+parser.add_argument('--momentum', default=0.5, type=float, help='Momentum used for the update of memory bank')
 
 # args parse
 args = parser.parse_args()
-data_root, method_name, domains, proj_dim = args.data_root, args.method_name, args.domains, args.proj_dim
+data_root, data_name, method_name, proj_dim = args.data_root, args.data_name, args.method_name, args.proj_dim
 temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
 ranks, save_root, negs, momentum = args.ranks, args.save_root, args.negs, args.momentum
 
 # data prepare
-train_data = DomainDataset(data_root, domains, split='train')
-val_data = DomainDataset(data_root, domains, split='val')
+train_data = DomainDataset(data_root, data_name, split='train')
+val_data = DomainDataset(data_root, data_name, split='val')
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8, drop_last=True)
 val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
 
@@ -31,15 +30,7 @@ val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_work
 model = Backbone(proj_dim).cuda()
 # optimizer config
 optimizer = Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
-if method_name == 'moco':
-    shadow = Backbone(proj_dim).cuda()
-    # initialize shadow as a shadow model of backbone
-    for param_q, param_k in zip(model.parameters(), shadow.parameters()):
-        param_k.data.copy_(param_q.data)
-        # not update by gradient
-        param_k.requires_grad = False
-    loss_criterion = MoCoLoss(negs, proj_dim, temperature).cuda()
-elif method_name == 'npid':
+if method_name == 'npid':
     loss_criterion = NPIDLoss(len(train_data), negs, proj_dim, momentum, temperature)
 elif method_name == 'simclr':
     loss_criterion = SimCLRLoss(temperature)
@@ -47,7 +38,7 @@ else:
     raise NotImplemented('not support for {}'.format(method_name))
 
 results = {'train_loss': [], 'val_precise': []}
-save_name_pre = '{}_{}'.format(domains, method_name)
+save_name_pre = '{}_{}'.format(data_name, method_name)
 if not os.path.exists(save_root):
     os.makedirs(save_root)
 best_precise, total_loss, current_iter = 0.0, 0.0, 0
@@ -63,14 +54,8 @@ for epoch in range(1, epochs + 1):
 
         if method_name == 'npid':
             loss, pos_samples = loss_criterion(proj_1, pos_index)
-        elif method_name == 'simclr':
-            _, proj_2 = model(img_2)
-            loss = loss_criterion(proj_1, proj_2)
         else:
-            # shuffle BN
-            idx = torch.randperm(batch_size, device=img_2.device)
-            _, proj_2 = shadow(img_2[idx])
-            proj_2 = proj_2[torch.argsort(idx)]
+            _, proj_2 = model(img_2)
             loss = loss_criterion(proj_1, proj_2)
 
         optimizer.zero_grad()
@@ -79,11 +64,6 @@ for epoch in range(1, epochs + 1):
 
         if method_name == 'npid':
             loss_criterion.enqueue(proj_1, pos_index, pos_samples)
-        if method_name == 'moco':
-            loss_criterion.enqueue(proj_2)
-            # momentum update
-            for parameter_q, parameter_k in zip(model.parameters(), shadow.parameters()):
-                parameter_k.data.copy_(parameter_k.data * momentum + parameter_q.data * (1.0 - momentum))
 
         current_iter += 1
         total_loss += loss.item()

@@ -37,7 +37,7 @@ def parse_common_args():
 def get_transform(split='train'):
     if split == 'train':
         return transforms.Compose([
-            transforms.RandomResizedCrop(256, (1.0, 1.12), interpolation=Image.BICUBIC),
+            transforms.RandomResizedCrop(256, (1.0, 1.12)),
             transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
             transforms.RandomGrayscale(p=0.2),
             transforms.RandomHorizontalFlip(p=0.5),
@@ -55,9 +55,13 @@ class DomainDataset(Dataset):
         super(DomainDataset, self).__init__()
 
         self.data_name = data_name
+        if data_name == 'cityscapes':
+            self.domains = ['clear', 'fog', 'rain']
+        else:
+            self.domains = ['image', 'sketch']
         self.images, self.categories, self.labels = [], [], []
-        for i, domain in enumerate(domains):
-            images = sorted(glob.glob(os.path.join(data_root, split, domain, '*', '*.png')))
+        for i, domain in enumerate(self.domains):
+            images = sorted(glob.glob(os.path.join(data_root, data_name, split, domain, '*.png')))
             # which image
             self.images += images
             # which domain
@@ -129,11 +133,8 @@ def recall(vectors, ranks, domains, categories, labels):
     for r in ranks:
         correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
         acc['cross@{}'.format(r)] = (torch.sum(correct) / correct.size(0)).item()
-    # the mean recall is chosen as the representative of precise
-    precise, num = 0.0, len(acc)
-    for key, value in acc.items():
-        precise += value
-    acc['val_precise'] = precise / num
+    # the cross recall is chosen as the representative of precise
+    acc['val_precise'] = acc['cross@{}'.format(ranks[0])]
     return acc
 
 
