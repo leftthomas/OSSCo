@@ -4,6 +4,7 @@ import random
 
 import pandas as pd
 import torch
+from PIL import Image
 from torch.optim import Adam
 from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data.dataloader import DataLoader
@@ -215,15 +216,15 @@ for r in range(1, rounds + 1):
     for epoch in range(1, contrast_epochs + 1):
         backbone.train()
         train_bar = tqdm(train_contrast_loader, dynamic_ncols=True)
-        for img_1, img_2, _, _, _, pos_index in train_bar:
+        for img_1, img_2, img_name, _, _, pos_index in train_bar:
             img_1, img_2 = img_1.cuda(), img_2.cuda()
             _, proj_1 = backbone(img_1)
             _, proj_2 = backbone(img_2)
             with torch.no_grad():
                 fs = random.choices(Fs, k=batch_size)
                 img_3 = []
-                for f, img in zip(fs, torch.chunk(img_1, chunks=batch_size, dim=0)):
-                    img_3.append(f(img))
+                for f, img in zip(fs, img_name):
+                    img_3.append(f((get_transform('train')(Image.open(img))).unsqueeze(dim=0).cuda()))
                 img_3 = torch.cat(img_3, dim=0)
             _, proj_3 = backbone(img_3)
             loss = criterion_contrast(proj_1, proj_2, proj_3)
