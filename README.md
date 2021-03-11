@@ -114,34 +114,34 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 <tbody>
   <tr>
     <td align="center">NPID</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">0.70</td>
+    <td align="center">0.70</td>
+    <td align="center">1.11</td>
+    <td align="center">1.25</td>
+    <td align="center">33.43</td>
+    <td align="center">41.92</td>
+    <td align="center">50.84</td>
+    <td align="center">59.47</td>
+    <td align="center">1.39</td>
+    <td align="center">1.81</td>
+    <td align="center">2.51</td>
+    <td align="center">4.04</td>
     <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">48.61</td>
+    <td align="center">55.99</td>
+    <td align="center">64.07</td>
+    <td align="center">70.33</td>
+    <td align="center">76.18</td>
+    <td align="center">82.59</td>
+    <td align="center">86.91</td>
+    <td align="center">89.97</td>
+    <td align="center">29.53</td>
+    <td align="center">37.33</td>
+    <td align="center">43.87</td>
+    <td align="center">50.70</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
@@ -192,34 +192,34 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 <tbody>
   <tr>
     <td align="center">NPID</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">37.19</td>
+    <td align="center">48.74</td>
+    <td align="center">63.82</td>
+    <td align="center">73.37</td>
+    <td align="center">40.70</td>
+    <td align="center">52.76</td>
+    <td align="center">67.84</td>
+    <td align="center">73.87</td>
+    <td align="center">27.14</td>
+    <td align="center">34.42</td>
+    <td align="center">45.98</td>
+    <td align="center">60.05</td>
     <td align="center"><a href="https://pan.baidu.com/s/1oUbOqWIJaJbtUDqcqmklgw">bbiv</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">24.12</td>
+    <td align="center">39.20</td>
+    <td align="center">56.28</td>
+    <td align="center">72.36</td>
+    <td align="center">32.66</td>
+    <td align="center">45.23</td>
+    <td align="center">56.28</td>
+    <td align="center">68.84</td>
+    <td align="center">15.08</td>
+    <td align="center">21.86</td>
+    <td align="center">33.67</td>
+    <td align="center">48.99</td>
     <td align="center"><a href="https://pan.baidu.com/s/1ogY5eC1eb3IHemOsVO-ieg">hdhn</a></td>
   </tr>
   <tr>
