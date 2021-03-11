@@ -222,7 +222,7 @@ for r in range(1, rounds + 1):
             with torch.no_grad():
                 fs = random.choices(Fs, k=batch_size)
                 img_3 = []
-                for f, img in (fs, torch.chunk(img_1, chunks=batch_size, dim=0)):
+                for f, img in zip(fs, torch.chunk(img_1, chunks=batch_size, dim=0)):
                     img_3.append(f(img))
                 img_3 = torch.cat(img_3, dim=0)
             _, proj_3 = backbone(img_3)
