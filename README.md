@@ -60,7 +60,7 @@ optional arguments:
 --save_root                   Result saved root path [default value is 'result']
 # args for ossco
 --style_num                   Number of used styles [default value is 8]
---gan_iter                    Number of bp to train gan model [default value is 4000]
+--gan_iter                    Number of bp to train gan model [default value is 5000]
 --rounds                      Number of round to train whole model [default value is 5]
 # args for npid
 --negs                        Negative sample number [default value is 4096]

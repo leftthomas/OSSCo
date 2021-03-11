@@ -83,14 +83,16 @@ class DomainDataset(Dataset):
         return len(self.images)
 
     def refresh(self, style_num):
-        images, categories, labels = [], [], []
+        images, names, categories, labels = [], [], [], []
         # need reverse del index to avoid the del index not exist error
         indexes = sorted(random.sample(range(0, len(self.images)), k=style_num), reverse=True)
         for i in indexes:
-            images.append(self.images.pop(i))
+            name = self.images.pop(i)
+            names.append(name)
+            images.append(Image.open(name))
             categories.append(self.categories.pop(i))
             labels.append(self.labels.pop(i))
-        return images, categories, labels
+        return images, names, categories, labels
 
 
 def recall(vectors, ranks, domains, categories, labels):
