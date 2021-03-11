@@ -151,8 +151,8 @@ for r in range(1, rounds + 1):
                 total_dgs_loss += adversarial_loss.item() / style_num
 
             current_gan_iter += 1
-            train_bar.set_description('Train Iter: [({}){}/{}] FG Loss: {:.4f}, DFs Loss: {:.4f}, DGs Loss: {:.4f}'
-                                      .format(r, current_gan_iter, gan_iter, total_fg_loss / current_gan_iter,
+            train_bar.set_description('[{}/{}] Train Iter: [{}/{}] FG Loss: {:.4f}, DFs Loss: {:.4f}, DGs Loss: {:.4f}'
+                                      .format(r, rounds, current_gan_iter, gan_iter, total_fg_loss / current_gan_iter,
                                               total_dfs_loss / current_gan_iter, total_dgs_loss / current_gan_iter))
             if current_gan_iter % 100 == 0:
                 gan_results['train_fg_loss'].append(total_fg_loss / current_gan_iter)
