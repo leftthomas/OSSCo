@@ -14,6 +14,12 @@ A PyTorch implementation of OSSCo based on ICCV 2021 paper
 conda install pytorch=1.7.1 torchvision cudatoolkit=11.0 -c pytorch
 ```
 
+- [Pytorch Metric Learning](https://kevinmusgrave.github.io/pytorch-metric-learning/)
+
+```
+pip install pytorch-metric-learning
+```
+
 ## Dataset
 
 [Weather Cityscapes](https://team.inria.fr/rits/computer-vision/weather-augment/) and
@@ -51,7 +57,7 @@ optional arguments:
 # common args
 --data_root                   Datasets root path [default value is 'data']
 --data_name                   Dataset name [default value is 'cityscapes'](choices='cityscapes', 'cufsf'])
---method_name                 Compared method name [default value is 'ossco'](choices=['ossco', 'simclr', 'npid'])
+--method_name                 Compared method name [default value is 'ossco'](choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'normalizedsoftmax'])
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
 --batch_size                  Number of images in each mini-batch [default value is 16]
@@ -65,6 +71,9 @@ optional arguments:
 # args for npid
 --negs                        Negative sample number [default value is 4096]
 --momentum                    Momentum used for the update of memory bank [default value is 0.5]
+# args for proxyanchor
+--margin                      Margin used for proxy and samples [default value is 0.1]
+--alpha                       Scale value used for exponent [default value is 32]
 ```
 
 For example, to train `npid` on `cufsf` dataset, report `R@1` and `R@5`:
@@ -145,6 +154,38 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
+    <td align="center">ProxyAnchor</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+  </tr>
+  <tr>
+    <td align="center">NormalizedSoftmax</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+  </tr>
+  <tr>
     <td align="center">OSSCo</td>
     <td align="center"><b></b></td>
     <td align="center"><b></b></td>
@@ -221,6 +262,38 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center">33.67</td>
     <td align="center">48.99</td>
     <td align="center"><a href="https://pan.baidu.com/s/1ogY5eC1eb3IHemOsVO-ieg">hdhn</a></td>
+  </tr>
+  <tr>
+    <td align="center">ProxyAnchor</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+  </tr>
+  <tr>
+    <td align="center">NormalizedSoftmax</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">OSSCo</td>
