@@ -57,7 +57,7 @@ class DomainDataset(Dataset):
 
         self.data_name = data_name
         if data_name == 'cityscapes':
-            self.domains = ['clear', 'fog', 'rain']
+            self.domains = ['clear', 'fog']
         else:
             self.domains = ['image', 'sketch']
         self.images, self.categories, self.labels = [], [], []
@@ -97,48 +97,32 @@ class DomainDataset(Dataset):
         return images, names, categories, labels
 
 
-def recall(vectors, ranks, domains, categories, labels):
-    domain_vectors, domain_labels, acc = [], [], {}
-    for i, domain in enumerate(domains):
-        domain_vectors.append(vectors[torch.as_tensor(categories) == i])
-        domain_labels.append(torch.as_tensor(labels, device=vectors.device)[torch.as_tensor(categories) == i])
-    for i in range(len(domain_vectors)):
-        for j in range(i + 1, len(domain_vectors)):
-            domain_a_vectors = domain_vectors[i]
-            domain_b_vectors = domain_vectors[j]
-            domain_a_labels = domain_labels[i]
-            domain_b_labels = domain_labels[j]
-            # A -> B
-            sim_ab = domain_a_vectors.mm(domain_b_vectors.t())
-            idx_ab = sim_ab.topk(k=ranks[-1], dim=-1, largest=True)[1]
-            # B -> A
-            sim_ba = domain_b_vectors.mm(domain_a_vectors.t())
-            idx_ba = sim_ba.topk(k=ranks[-1], dim=-1, largest=True)[1]
-            # cross domain A and B
-            vectors = torch.cat((domain_a_vectors, domain_b_vectors), dim=0)
-            labels = torch.cat((domain_a_labels, domain_b_labels), dim=0)
-            sim = vectors.mm(vectors.t())
-            sim.fill_diagonal_(-np.inf)
-            idx = sim.topk(k=ranks[-1], dim=-1, largest=True)[1]
-
-            for r in ranks:
-                correct_ab = (torch.eq(domain_b_labels[idx_ab[:, 0:r]], domain_a_labels.unsqueeze(dim=-1))).any(dim=-1)
-                acc['{}->{}@{}'.format(domains[i], domains[j], r)] = (torch.sum(correct_ab) / correct_ab.size(0)).item()
-                correct_ba = (torch.eq(domain_a_labels[idx_ba[:, 0:r]], domain_b_labels.unsqueeze(dim=-1))).any(dim=-1)
-                acc['{}->{}@{}'.format(domains[j], domains[i], r)] = (torch.sum(correct_ba) / correct_ba.size(0)).item()
-                correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
-                acc['{}<->{}@{}'.format(domains[i], domains[j], r)] = (torch.sum(correct) / correct.size(0)).item()
-    # cross all domains
-    vectors = torch.cat(domain_vectors, dim=0)
-    labels = torch.cat(domain_labels, dim=0)
+def recall(vectors, ranks, domains, labels):
+    acc = {}
+    domain_a_vectors = vectors[: len(vectors) // 2]
+    domain_b_vectors = vectors[len(vectors) // 2:]
+    domain_a_labels = vectors[: len(labels) // 2]
+    domain_b_labels = vectors[len(labels) // 2:]
+    # A -> B
+    sim_ab = domain_a_vectors.mm(domain_b_vectors.t())
+    idx_ab = sim_ab.topk(k=ranks[-1], dim=-1, largest=True)[1]
+    # B -> A
+    sim_ba = domain_b_vectors.mm(domain_a_vectors.t())
+    idx_ba = sim_ba.topk(k=ranks[-1], dim=-1, largest=True)[1]
+    # cross A and B
     sim = vectors.mm(vectors.t())
     sim.fill_diagonal_(-np.inf)
     idx = sim.topk(k=ranks[-1], dim=-1, largest=True)[1]
+
     for r in ranks:
+        correct_ab = (torch.eq(domain_b_labels[idx_ab[:, 0:r]], domain_a_labels.unsqueeze(dim=-1))).any(dim=-1)
+        acc['{}->{}@{}'.format(domains[0], domains[1], r)] = (torch.sum(correct_ab) / correct_ab.size(0)).item()
+        correct_ba = (torch.eq(domain_a_labels[idx_ba[:, 0:r]], domain_b_labels.unsqueeze(dim=-1))).any(dim=-1)
+        acc['{}->{}@{}'.format(domains[1], domains[0], r)] = (torch.sum(correct_ba) / correct_ba.size(0)).item()
         correct = (torch.eq(labels[idx[:, 0:r]], labels.unsqueeze(dim=-1))).any(dim=-1)
-        acc['cross@{}'.format(r)] = (torch.sum(correct) / correct.size(0)).item()
+        acc['{}<->{}@{}'.format(domains[0], domains[1], r)] = (torch.sum(correct) / correct.size(0)).item()
     # the cross recall is chosen as the representative of precise
-    acc['val_precise'] = acc['cross@{}'.format(ranks[0])]
+    acc['val_precise'] = acc['{}<->{}@{}'.format(domains[0], domains[1], ranks[0])]
     return acc
 
 
@@ -150,8 +134,7 @@ def val_contrast(net, data_loader, results, ranks, current_iter, total_iter):
         for data, _, _, _, _, _ in tqdm(data_loader, desc='Feature extracting', dynamic_ncols=True):
             vectors.append(net(data.cuda())[0])
         vectors = torch.cat(vectors, dim=0)
-        acc = recall(vectors, ranks, data_loader.dataset.domains, data_loader.dataset.categories,
-                     data_loader.dataset.labels)
+        acc = recall(vectors, ranks, data_loader.dataset.domains, data_loader.dataset.labels)
         precise = acc['val_precise'] * 100
         print('Val Iter: [{}/{}] Precise: {:.2f}%'.format(current_iter, total_iter, precise))
         for key, value in acc.items():

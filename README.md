@@ -22,7 +22,7 @@ pip install pytorch-metric-learning
 
 ## Dataset
 
-[Weather Cityscapes](https://team.inria.fr/rits/computer-vision/weather-augment/) and
+[Cityscapes FoggyDBF](https://www.cityscapes-dataset.com/) and
 [CUFSF](http://mmlab.ie.cuhk.edu.hk/archive/cufsf/) datasets are used in this repo, you could download these datasets
 from official websites, or download them from [MEGA](https://mega.nz/folder/5sQD0QqK#zM5GfOSPvpPpfquGJd8Vjg). The data
 should be rearranged, please refer the paper to acquire the details of `train/val` split. The data directory structure
@@ -38,10 +38,7 @@ is shown as follows:
            └── ...
        ├── fog (fog images)
            same structure as clear
-           ...       
-       ├── rain (rain images)
-           same structure as clear
-           ...    
+           ...         
     ├── val
        same structure as train
    ...
@@ -94,9 +91,9 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 <thead>
   <tr>
     <th rowspan="2">Method</th>
+    <th colspan="4">Clear --&gt; Foggy</th>
+    <th colspan="4">Foggy --&gt; Clear</th>
     <th colspan="4">Clear &lt;--&gt; Foggy</th>
-    <th colspan="4">Clear &lt;--&gt; Rainy</th>
-    <th colspan="4">Rainy &lt;--&gt; Foggy</th>
     <th rowspan="2">Download</th>
   </tr>
   <tr>
