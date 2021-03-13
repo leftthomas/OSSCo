@@ -68,12 +68,6 @@ optional arguments:
 --style_num                   Number of used styles [default value is 8]
 --gan_iter                    Number of bp to train gan model [default value is 5000]
 --rounds                      Number of round to train whole model [default value is 5]
-# args for npid
---negs                        Negative sample number [default value is 4096]
---momentum                    Momentum used for the update of memory bank [default value is 0.5]
-# args for proxyanchor
---margin                      Margin used for proxy and samples [default value is 0.1]
---alpha                       Scale value used for exponent [default value is 32]
 ```
 
 For example, to train `npid` on `cufsf` dataset, report `R@1` and `R@5`:
@@ -154,7 +148,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
-    <td align="center">ProxyAnchor</td>
+    <td align="center">SoftTriple</td>
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
@@ -170,7 +164,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
-    <td align="center">SoftTriple</td>
+    <td align="center">ProxyAnchor</td>
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
@@ -264,7 +258,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1ogY5eC1eb3IHemOsVO-ieg">hdhn</a></td>
   </tr>
   <tr>
-    <td align="center">ProxyAnchor</td>
+    <td align="center">SoftTriple</td>
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
@@ -280,7 +274,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
-    <td align="center">SoftTriple</td>
+    <td align="center">ProxyAnchor</td>
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>

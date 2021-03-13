@@ -140,7 +140,7 @@ class SimCLRLoss(nn.Module):
 
 
 class NPIDLoss(nn.Module):
-    def __init__(self, n, negs, proj_dim, momentum, temperature):
+    def __init__(self, n, proj_dim, temperature, negs=4096, momentum=0.5):
         super(NPIDLoss, self).__init__()
         self.n = n
         self.negs = negs

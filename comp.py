@@ -11,18 +11,11 @@ from model import Backbone, SimCLRLoss, NPIDLoss
 from utils import DomainDataset, val_contrast, parse_common_args
 
 parser = parse_common_args()
-# args for NPID
-parser.add_argument('--negs', default=4096, type=int, help='Negative sample number')
-parser.add_argument('--momentum', default=0.5, type=float, help='Momentum used for the update of memory bank')
-# args for ProxyAnchor
-parser.add_argument('--margin', default=0.1, type=int, help='Margin used for proxy and samples')
-parser.add_argument('--alpha', default=32, type=float, help='Scale value used for exponent')
-
 # args parse
 args = parser.parse_args()
 data_root, data_name, method_name, proj_dim = args.data_root, args.data_name, args.method_name, args.proj_dim
-temperature, batch_size, total_iter, margin = args.temperature, args.batch_size, args.total_iter, args.margin
-ranks, save_root, negs, momentum, alpha = args.ranks, args.save_root, args.negs, args.momentum, args.alpha
+temperature, batch_size, total_iter = args.temperature, args.batch_size, args.total_iter
+ranks, save_root = args.ranks, args.save_root
 
 # data prepare
 train_data = DomainDataset(data_root, data_name, split='train')
@@ -35,11 +28,11 @@ model = Backbone(proj_dim).cuda()
 # optimizer config
 optimizer = Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
 if method_name == 'npid':
-    loss_criterion = NPIDLoss(len(train_data), negs, proj_dim, momentum, temperature)
+    loss_criterion = NPIDLoss(len(train_data), proj_dim=proj_dim, temperature=temperature)
 elif method_name == 'simclr':
     loss_criterion = SimCLRLoss(temperature)
 elif method_name == 'proxyanchor':
-    loss_criterion = ProxyAnchorLoss(train_data.num_class, proj_dim, margin, alpha).cuda()
+    loss_criterion = ProxyAnchorLoss(train_data.num_class, proj_dim).cuda()
     loss_optimizer = Adam(loss_criterion.parameters(), lr=1e-3, weight_decay=1e-6)
 elif method_name == 'softtriple':
     loss_criterion = SoftTripleLoss(train_data.num_class, proj_dim).cuda()
