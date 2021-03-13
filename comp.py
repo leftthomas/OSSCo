@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 import torch
-from pytorch_metric_learning.losses import ProxyAnchorLoss, NormalizedSoftmaxLoss
+from pytorch_metric_learning.losses import ProxyAnchorLoss, SoftTripleLoss
 from torch.optim import Adam
 from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
@@ -41,8 +41,8 @@ elif method_name == 'simclr':
 elif method_name == 'proxyanchor':
     loss_criterion = ProxyAnchorLoss(train_data.num_class, proj_dim, margin, alpha).cuda()
     loss_optimizer = Adam(loss_criterion.parameters(), lr=1e-3, weight_decay=1e-6)
-elif method_name == 'normalizedsoftmax':
-    loss_criterion = NormalizedSoftmaxLoss(train_data.num_class, proj_dim, temperature).cuda()
+elif method_name == 'softtriple':
+    loss_criterion = SoftTripleLoss(train_data.num_class, proj_dim).cuda()
     loss_optimizer = Adam(loss_criterion.parameters(), lr=1e-3, weight_decay=1e-6)
 else:
     raise NotImplemented('not support for {}'.format(method_name))
@@ -72,11 +72,11 @@ for epoch in range(1, epochs + 1):
         else:
             loss = loss_criterion(proj_1, img_label)
         optimizer.zero_grad()
-        if method_name in ['proxyanchor', 'normalizedsoftmax']:
+        if method_name in ['proxyanchor', 'softtriple']:
             loss_optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if method_name in ['proxyanchor', 'normalizedsoftmax']:
+        if method_name in ['proxyanchor', 'softtriple']:
             loss_optimizer.step()
 
         if method_name == 'npid':

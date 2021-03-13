@@ -57,7 +57,7 @@ optional arguments:
 # common args
 --data_root                   Datasets root path [default value is 'data']
 --data_name                   Dataset name [default value is 'cityscapes'](choices='cityscapes', 'cufsf'])
---method_name                 Compared method name [default value is 'ossco'](choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'normalizedsoftmax'])
+--method_name                 Compared method name [default value is 'ossco'](choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple'])
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
 --batch_size                  Number of images in each mini-batch [default value is 16]
@@ -170,7 +170,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
-    <td align="center">NormalizedSoftmax</td>
+    <td align="center">SoftTriple</td>
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
@@ -280,7 +280,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
-    <td align="center">NormalizedSoftmax</td>
+    <td align="center">SoftTriple</td>
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
