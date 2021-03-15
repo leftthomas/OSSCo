@@ -27,7 +27,7 @@ def parse_common_args():
     parser.add_argument('--data_name', default='cityscapes', type=str, choices=['cityscapes', 'cufsf'],
                         help='Dataset name')
     parser.add_argument('--method_name', default='ossco', type=str,
-                        choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple'],
+                        choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple', 'pretrained'],
                         help='Compared method name')
     parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
     parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')

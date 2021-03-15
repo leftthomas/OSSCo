@@ -54,7 +54,7 @@ optional arguments:
 # common args
 --data_root                   Datasets root path [default value is 'data']
 --data_name                   Dataset name [default value is 'cityscapes'](choices='cityscapes', 'cufsf'])
---method_name                 Compared method name [default value is 'ossco'](choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple'])
+--method_name                 Compared method name [default value is 'ossco'](choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple', 'pretrained'])
 --proj_dim                    Projected feature dim for computing loss [default value is 128]
 --temperature                 Temperature used in softmax [default value is 0.1]
 --batch_size                  Number of images in each mini-batch [default value is 16]
@@ -112,6 +112,22 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
 </thead>
 <tbody>
+  <tr>
+    <td align="center">Pretrained</td>
+    <td align="center">22.80</td>
+    <td align="center">29.40</td>
+    <td align="center">37.20</td>
+    <td align="center">46.40</td>
+    <td align="center">21.60</td>
+    <td align="center">28.40</td>
+    <td align="center">35.60</td>
+    <td align="center">43.60</td>
+    <td align="center">5.90</td>
+    <td align="center">8.30</td>
+    <td align="center">11.20</td>
+    <td align="center">14.10</td>
+    <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
+  </tr>
   <tr>
     <td align="center">NPID</td>
     <td align="center">22.80</td>
@@ -222,6 +238,22 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
 </thead>
 <tbody>
+  <tr>
+    <td align="center">Pretrained</td>
+    <td align="center">22.80</td>
+    <td align="center">29.40</td>
+    <td align="center">37.20</td>
+    <td align="center">46.40</td>
+    <td align="center">21.60</td>
+    <td align="center">28.40</td>
+    <td align="center">35.60</td>
+    <td align="center">43.60</td>
+    <td align="center">5.90</td>
+    <td align="center">8.30</td>
+    <td align="center">11.20</td>
+    <td align="center">14.10</td>
+    <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
+  </tr>
   <tr>
     <td align="center">NPID</td>
     <td align="center">37.19</td>
