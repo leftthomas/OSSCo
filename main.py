@@ -100,7 +100,7 @@ for r in range(1, rounds + 1):
         train_bar = tqdm(train_gan_loader, dynamic_ncols=True)
         for content, _, _, _, _, _ in train_bar:
             content = content.cuda()
-            styles = [(get_transform('train')(style)).unsqueeze(dim=0).cuda() for style in style_images]
+            styles = [(get_transform(data_name, 'train')(style)).unsqueeze(dim=0).cuda() for style in style_images]
             for style, style_buffer, content_buffer, F, G, DF, DG, optimizer_FG, optimizer_DF, optimizer_DG, \
                 lr_scheduler_FG, lr_scheduler_DF, lr_scheduler_DG in zip(styles, fake_style_buffer, fake_content_buffer,
                                                                          Fs, Gs, DFs, DGs, optimizer_FGs, optimizer_DFs,
@@ -224,7 +224,7 @@ for r in range(1, rounds + 1):
                 fs = random.choices(Fs, k=batch_size)
                 img_3 = []
                 for f, img in zip(fs, img_name):
-                    img_3.append(f((get_transform('train')(Image.open(img))).unsqueeze(dim=0).cuda()))
+                    img_3.append(f((get_transform(data_name, 'train')(Image.open(img))).unsqueeze(dim=0).cuda()))
                 img_3 = torch.cat(img_3, dim=0)
             _, proj_3 = backbone(img_3)
             loss = criterion_contrast(proj_1, proj_2, proj_3)
