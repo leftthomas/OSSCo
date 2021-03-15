@@ -63,8 +63,8 @@ optional arguments:
 --save_root                   Result saved root path [default value is 'result']
 # args for ossco
 --style_num                   Number of used styles [default value is 8]
---gan_iter                    Number of bp to train gan model [default value is 5000]
---rounds                      Number of round to train whole model [default value is 5]
+--gan_iter                    Number of bp to train gan model [default value is 4000]
+--rounds                      Number of round to train whole model [default value is 3]
 ```
 
 For example, to train `npid` on `cufsf` dataset, report `R@1` and `R@5`:
@@ -114,66 +114,66 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 <tbody>
   <tr>
     <td align="center">NPID</td>
-    <td align="center">0.70</td>
-    <td align="center">0.70</td>
-    <td align="center">1.11</td>
-    <td align="center">1.25</td>
-    <td align="center">33.43</td>
-    <td align="center">41.92</td>
-    <td align="center">50.84</td>
-    <td align="center">59.47</td>
-    <td align="center">1.39</td>
-    <td align="center">1.81</td>
-    <td align="center">2.51</td>
-    <td align="center">4.04</td>
+    <td align="center">22.80</td>
+    <td align="center">29.40</td>
+    <td align="center">37.20</td>
+    <td align="center">46.40</td>
+    <td align="center">21.60</td>
+    <td align="center">28.40</td>
+    <td align="center">35.60</td>
+    <td align="center">43.60</td>
+    <td align="center">5.90</td>
+    <td align="center">8.30</td>
+    <td align="center">11.20</td>
+    <td align="center">14.10</td>
     <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
-    <td align="center">48.61</td>
-    <td align="center">55.99</td>
-    <td align="center">64.07</td>
-    <td align="center">70.33</td>
-    <td align="center">76.18</td>
-    <td align="center">82.59</td>
-    <td align="center">86.91</td>
-    <td align="center">89.97</td>
-    <td align="center">29.53</td>
-    <td align="center">37.33</td>
-    <td align="center">43.87</td>
-    <td align="center">50.70</td>
+    <td align="center">92.20</td>
+    <td align="center">94.60</td>
+    <td align="center">96.60</td>
+    <td align="center">97.80</td>
+    <td align="center">89.60</td>
+    <td align="center">93.00</td>
+    <td align="center">95.40</td>
+    <td align="center">98.20</td>
+    <td align="center">80.10</td>
+    <td align="center">85.40</td>
+    <td align="center">88.80</td>
+    <td align="center">92.30</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">SoftTriple</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">99.60</td>
+    <td align="center">99.80</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">99.80</td>
+    <td align="center">99.80</td>
+    <td align="center">99.80</td>
+    <td align="center">100.00</td>
+    <td align="center">98.40</td>
+    <td align="center">99.70</td>
+    <td align="center">99.80</td>
+    <td align="center">99.90</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
@@ -256,34 +256,34 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
   <tr>
     <td align="center">SoftTriple</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">86.43</td>
+    <td align="center">92.46</td>
+    <td align="center">95.48</td>
+    <td align="center">98.99</td>
+    <td align="center">89.45</td>
+    <td align="center">93.47</td>
+    <td align="center">97.49</td>
+    <td align="center">99.50</td>
+    <td align="center">79.65</td>
+    <td align="center">85.93</td>
+    <td align="center">92.71</td>
+    <td align="center">96.23</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
-    <td align="center"></td>
+    <td align="center">95.48</td>
+    <td align="center">97.99</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">95.48</td>
+    <td align="center">98.49</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">91.71</td>
+    <td align="center">95.73</td>
+    <td align="center">98.24</td>
+    <td align="center">99.75</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>

@@ -187,9 +187,9 @@ class NPIDLoss(nn.Module):
         self.bank.index_copy_(0, pos_index, pos_samples)
 
 
-class OSSTCoLoss(nn.Module):
+class OSSCoLoss(nn.Module):
     def __init__(self, temperature):
-        super(OSSTCoLoss, self).__init__()
+        super(OSSCoLoss, self).__init__()
         self.simclr_loss = SimCLRLoss(temperature)
 
     def forward(self, proj_1, proj_2, proj_3):

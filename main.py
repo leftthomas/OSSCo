@@ -11,13 +11,13 @@ from torch.utils.data.dataloader import DataLoader
 from torchvision.utils import save_image
 from tqdm import tqdm
 
-from model import Backbone, Generator, Discriminator, OSSTCoLoss
+from model import Backbone, Generator, Discriminator, OSSCoLoss
 from utils import DomainDataset, weights_init_normal, ReplayBuffer, parse_common_args, get_transform, val_contrast
 
 parser = parse_common_args()
 parser.add_argument('--style_num', default=8, type=int, help='Number of used styles')
-parser.add_argument('--gan_iter', default=5000, type=int, help='Number of bp to train gan model')
-parser.add_argument('--rounds', default=5, type=int, help='Number of round to train whole model')
+parser.add_argument('--gan_iter', default=4000, type=int, help='Number of bp to train gan model')
+parser.add_argument('--rounds', default=3, type=int, help='Number of round to train whole model')
 
 # args parse
 args = parser.parse_args()
@@ -44,7 +44,7 @@ optimizer_backbone = Adam(backbone.parameters(), lr=1e-3, weight_decay=1e-6)
 # loss setup
 criterion_adversarial = torch.nn.MSELoss()
 criterion_cycle = torch.nn.L1Loss()
-criterion_contrast = OSSTCoLoss(temperature)
+criterion_contrast = OSSCoLoss(temperature)
 
 contrast_results = {'train_loss': [], 'val_precise': []}
 save_name_pre = '{}_{}_{}_{}_{}'.format(data_name, method_name, style_num, rounds, gan_iter)
@@ -119,7 +119,7 @@ for r in range(1, rounds + 1):
                     pred_fake_content, target_fake_content)
                 # cycle loss
                 cycle_loss = criterion_cycle(G(fake_style), content) + criterion_cycle(F(fake_content), style)
-                fg_loss = adversarial_loss + 10 * cycle_loss
+                fg_loss = adversarial_loss + 100 * cycle_loss
                 fg_loss.backward()
                 optimizer_FG.step()
                 lr_scheduler_FG.step()
