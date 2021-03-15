@@ -98,11 +98,12 @@ class DomainDataset(Dataset):
 
 
 def recall(vectors, ranks, domains, labels):
+    labels = torch.as_tensor(labels, device=vectors.device)
     acc = {}
     domain_a_vectors = vectors[: len(vectors) // 2]
     domain_b_vectors = vectors[len(vectors) // 2:]
-    domain_a_labels = vectors[: len(labels) // 2]
-    domain_b_labels = vectors[len(labels) // 2:]
+    domain_a_labels = labels[: len(labels) // 2]
+    domain_b_labels = labels[len(labels) // 2:]
     # A -> B
     sim_ab = domain_a_vectors.mm(domain_b_vectors.t())
     idx_ab = sim_ab.topk(k=ranks[-1], dim=-1, largest=True)[1]
