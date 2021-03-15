@@ -20,6 +20,12 @@ conda install pytorch=1.7.1 torchvision cudatoolkit=11.0 -c pytorch
 pip install pytorch-metric-learning
 ```
 
+- [THOP](https://github.com/Lyken17/pytorch-OpCounter)
+
+```
+pip install thop
+```
+
 ## Dataset
 
 [Cityscapes FoggyDBF](https://www.cityscapes-dataset.com/) and
