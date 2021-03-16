@@ -5,6 +5,7 @@ import random
 import pandas as pd
 import torch
 from PIL import Image
+from thop import clever_format, profile
 from torch.optim import Adam
 from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data.dataloader import DataLoader
@@ -72,6 +73,14 @@ for r in range(1, rounds + 1):
                      zip(Fs, Gs)]
     optimizer_DFs = [Adam(DF.parameters(), lr=2e-4, betas=(0.5, 0.999)) for DF in DFs]
     optimizer_DGs = [Adam(DG.parameters(), lr=2e-4, betas=(0.5, 0.999)) for DG in DGs]
+
+    # compute macs and params
+    if r == 1:
+        macs_f, params_f = profile(Fs[0], inputs=(torch.randn(1, 3, 256, 256).cuda(),), verbose=False)
+        macs_df, params_df = profile(DFs[0], inputs=(torch.randn(1, 3, 256, 256).cuda(),), verbose=False)
+        macs, params = clever_format([(macs_f + macs_df) * 2 * style_num, (params_f + params_df) * 2 * style_num],
+                                     '%.2f')
+        print('Params: {}; MACs: {}'.format(params, macs))
 
     fake_style_buffer = [ReplayBuffer() for _ in range(style_num)]
     fake_content_buffer = [ReplayBuffer() for _ in range(style_num)]
