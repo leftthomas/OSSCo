@@ -120,82 +120,82 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 <tbody>
   <tr>
     <td align="center">Pretrained</td>
-    <td align="center">22.80</td>
-    <td align="center">29.40</td>
-    <td align="center">37.20</td>
-    <td align="center">46.40</td>
-    <td align="center">21.60</td>
-    <td align="center">28.40</td>
-    <td align="center">35.60</td>
-    <td align="center">43.60</td>
-    <td align="center">5.90</td>
-    <td align="center">8.30</td>
-    <td align="center">11.20</td>
-    <td align="center">14.10</td>
+    <td align="center">77.00</td>
+    <td align="center">82.00</td>
+    <td align="center">86.60</td>
+    <td align="center">89.20</td>
+    <td align="center">93.40</td>
+    <td align="center">95.60</td>
+    <td align="center">97.00</td>
+    <td align="center">98.40</td>
+    <td align="center">45.70</td>
+    <td align="center">53.30</td>
+    <td align="center">59.30</td>
+    <td align="center">65.40</td>
     <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
   </tr>
   <tr>
     <td align="center">NPID</td>
-    <td align="center">22.80</td>
-    <td align="center">29.40</td>
-    <td align="center">37.20</td>
-    <td align="center">46.40</td>
-    <td align="center">21.60</td>
-    <td align="center">28.40</td>
-    <td align="center">35.60</td>
-    <td align="center">43.60</td>
-    <td align="center">5.90</td>
-    <td align="center">8.30</td>
-    <td align="center">11.20</td>
-    <td align="center">14.10</td>
+    <td align="center">13.60</td>
+    <td align="center">19.40</td>
+    <td align="center">25.80</td>
+    <td align="center">37.00</td>
+    <td align="center">14.00</td>
+    <td align="center">20.60</td>
+    <td align="center">28.20</td>
+    <td align="center">37.60</td>
+    <td align="center">0.60</td>
+    <td align="center">0.70</td>
+    <td align="center">1.00</td>
+    <td align="center">2.10</td>
     <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
-    <td align="center">92.20</td>
-    <td align="center">94.60</td>
-    <td align="center">96.60</td>
-    <td align="center">97.80</td>
-    <td align="center">89.60</td>
-    <td align="center">93.00</td>
-    <td align="center">95.40</td>
-    <td align="center">98.20</td>
-    <td align="center">80.10</td>
-    <td align="center">85.40</td>
-    <td align="center">88.80</td>
-    <td align="center">92.30</td>
+    <td align="center">40.40</td>
+    <td align="center">51.20</td>
+    <td align="center">64.40</td>
+    <td align="center">75.00</td>
+    <td align="center">50.20</td>
+    <td align="center">62.20</td>
+    <td align="center">75.80</td>
+    <td align="center">85.00</td>
+    <td align="center">3.60</td>
+    <td align="center">4.50</td>
+    <td align="center">7.10</td>
+    <td align="center">10.10</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">SoftTriple</td>
-    <td align="center">99.60</td>
     <td align="center">99.80</td>
     <td align="center">100.00</td>
     <td align="center">100.00</td>
-    <td align="center">99.80</td>
-    <td align="center">99.80</td>
-    <td align="center">99.80</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
     <td align="center">100.00</td>
     <td align="center">98.40</td>
-    <td align="center">99.70</td>
-    <td align="center">99.80</td>
     <td align="center">99.90</td>
+    <td align="center">100.00</td>
+    <td align="center">100.00</td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
@@ -246,82 +246,82 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 <tbody>
   <tr>
     <td align="center">Pretrained</td>
-    <td align="center">22.80</td>
-    <td align="center">29.40</td>
-    <td align="center">37.20</td>
-    <td align="center">46.40</td>
-    <td align="center">21.60</td>
-    <td align="center">28.40</td>
-    <td align="center">35.60</td>
-    <td align="center">43.60</td>
-    <td align="center">5.90</td>
-    <td align="center">8.30</td>
-    <td align="center">11.20</td>
-    <td align="center">14.10</td>
+    <td align="center">9.05</td>
+    <td align="center">13.07</td>
+    <td align="center">18.09</td>
+    <td align="center">25.63</td>
+    <td align="center">16.58</td>
+    <td align="center">24.12</td>
+    <td align="center">30.65</td>
+    <td align="center">38.19</td>
+    <td align="center">0.25</td>
+    <td align="center">0.25</td>
+    <td align="center">1.26</td>
+    <td align="center">3.02</td>
     <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
   </tr>
   <tr>
     <td align="center">NPID</td>
-    <td align="center">37.19</td>
-    <td align="center">48.74</td>
-    <td align="center">63.82</td>
-    <td align="center">73.37</td>
-    <td align="center">40.70</td>
-    <td align="center">52.76</td>
-    <td align="center">67.84</td>
-    <td align="center">73.87</td>
-    <td align="center">27.14</td>
-    <td align="center">34.42</td>
-    <td align="center">45.98</td>
-    <td align="center">60.05</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
     <td align="center"><a href="https://pan.baidu.com/s/1oUbOqWIJaJbtUDqcqmklgw">bbiv</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
-    <td align="center">24.12</td>
-    <td align="center">39.20</td>
-    <td align="center">56.28</td>
-    <td align="center">72.36</td>
-    <td align="center">32.66</td>
-    <td align="center">45.23</td>
-    <td align="center">56.28</td>
-    <td align="center">68.84</td>
-    <td align="center">15.08</td>
-    <td align="center">21.86</td>
-    <td align="center">33.67</td>
-    <td align="center">48.99</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
     <td align="center"><a href="https://pan.baidu.com/s/1ogY5eC1eb3IHemOsVO-ieg">hdhn</a></td>
   </tr>
   <tr>
     <td align="center">SoftTriple</td>
-    <td align="center">86.43</td>
-    <td align="center">92.46</td>
-    <td align="center">95.48</td>
-    <td align="center">98.99</td>
-    <td align="center">89.45</td>
-    <td align="center">93.47</td>
-    <td align="center">97.49</td>
-    <td align="center">99.50</td>
-    <td align="center">79.65</td>
-    <td align="center">85.93</td>
-    <td align="center">92.71</td>
-    <td align="center">96.23</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
-    <td align="center">95.48</td>
-    <td align="center">97.99</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">95.48</td>
-    <td align="center">98.49</td>
-    <td align="center">100.00</td>
-    <td align="center">100.00</td>
-    <td align="center">91.71</td>
-    <td align="center">95.73</td>
-    <td align="center">98.24</td>
-    <td align="center">99.75</td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
+    <td align="center"></td>
     <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
   </tr>
   <tr>
