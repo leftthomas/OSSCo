@@ -59,7 +59,7 @@ class DomainDataset(Dataset):
         if data_name == 'cityscapes':
             self.domains = ['clear', 'fog']
         else:
-            self.domains = ['sketch', 'image']
+            self.domains = ['image', 'sketch']
         self.images, self.categories, self.labels = [], [], []
         for i, domain in enumerate(self.domains):
             images = sorted(glob.glob(os.path.join(data_root, data_name, split, domain, '*.png')))
