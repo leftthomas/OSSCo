@@ -11,9 +11,6 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from tqdm import tqdm
 
-normalizer = {'cityscapes': [(0.401, 0.437, 0.401), (0.186, 0.187, 0.187)],
-              'cufsf': [(0.537, 0.537, 0.537), (0.193, 0.193, 0.193)]}
-
 
 def parse_common_args():
     # for reproducibility
@@ -27,7 +24,7 @@ def parse_common_args():
     parser.add_argument('--data_name', default='cityscapes', type=str, choices=['cityscapes', 'cufsf'],
                         help='Dataset name')
     parser.add_argument('--method_name', default='ossco', type=str,
-                        choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple', 'pretrained'],
+                        choices=['ossco', 'simclr', 'npid', 'proxyanchor', 'softtriple'],
                         help='Compared method name')
     parser.add_argument('--proj_dim', default=128, type=int, help='Projected feature dim for computing loss')
     parser.add_argument('--temperature', default=0.1, type=float, help='Temperature used in softmax')
@@ -38,20 +35,20 @@ def parse_common_args():
     return parser
 
 
-def get_transform(data_name, split='train'):
+def get_transform(split='train'):
     if split == 'train':
         return transforms.Compose([
-            transforms.RandomResizedCrop(256, scale=(0.2, 1.0)),
+            transforms.RandomResizedCrop(256, (1.0, 1.12)),
             transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
             transforms.RandomGrayscale(p=0.2),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.ToTensor(),
-            transforms.Normalize(normalizer[data_name][0], normalizer[data_name][1])])
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     else:
         return transforms.Compose([
             transforms.Resize(256),
             transforms.ToTensor(),
-            transforms.Normalize(normalizer[data_name][0], normalizer[data_name][1])])
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 
 class DomainDataset(Dataset):
@@ -62,7 +59,7 @@ class DomainDataset(Dataset):
         if data_name == 'cityscapes':
             self.domains = ['clear', 'fog']
         else:
-            self.domains = ['sketch', 'image']
+            self.domains = ['image', 'sketch']
         self.images, self.categories, self.labels = [], [], []
         for i, domain in enumerate(self.domains):
             images = sorted(glob.glob(os.path.join(data_root, data_name, split, domain, '*.png')))
@@ -73,7 +70,7 @@ class DomainDataset(Dataset):
             # which instance
             self.labels += range(0, len(images))
             self.num_class = len(images)
-        self.transform = get_transform(data_name, split)
+        self.transform = get_transform(split)
 
     def __getitem__(self, index):
         img_name = self.images[index]
