@@ -131,7 +131,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center">53.30</td>
     <td align="center">59.30</td>
     <td align="center">65.40</td>
-    <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1G9qdUvrFHqEm1kbmPmel9w">ea3u</a></td>
   </tr>
   <tr>
     <td align="center">NPID</td>
@@ -147,7 +147,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center">0.70</td>
     <td align="center">1.00</td>
     <td align="center">2.10</td>
-    <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1PWLOBKWb8gUUibXOX9OQyA">hu2k</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
@@ -163,7 +163,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center">4.50</td>
     <td align="center">7.10</td>
     <td align="center">10.10</td>
-    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1aJGLPODKE4cCHLZYDg96jA">4jvm</a></td>
   </tr>
   <tr>
     <td align="center">SoftTriple</td>
@@ -179,7 +179,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center">99.90</td>
     <td align="center">100.00</td>
     <td align="center">100.00</td>
-    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1mYIRpX4ABX9YVLs0gFJVmg">6we5</a></td>
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
@@ -195,7 +195,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
-    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1aEQhoDH3ciAHESbzSfeR6Q">99k3</a></td>
   </tr>
   <tr>
     <td align="center">OSSCo</td>
@@ -211,7 +211,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><b></b></td>
     <td align="center"><b></b></td>
     <td align="center"><b></b></td>
-    <td align="center"><a href="https://pan.baidu.com/s/139IHtS2_tOZcEK2Qgt-yQw">5dzs</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/19d3v1PTnX-Z3dH7ifeY1oA">cb2b</a></td>
   </tr>
 </tbody>
 </table>
@@ -257,7 +257,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center">0.25</td>
     <td align="center">1.26</td>
     <td align="center">3.02</td>
-    <td align="center"><a href="https://pan.baidu.com/s/1Y9shBKadeBhkifopHexioA">r2bg</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1td9R3zV1buYg5ekvaEaMSg">imi4</a></td>
   </tr>
   <tr>
     <td align="center">NPID</td>
@@ -273,7 +273,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
-    <td align="center"><a href="https://pan.baidu.com/s/1oUbOqWIJaJbtUDqcqmklgw">bbiv</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1MKLAWG4x-tr-9T7M2exUFg">xvci</a></td>
   </tr>
   <tr>
     <td align="center">SimCLR</td>
@@ -289,7 +289,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
-    <td align="center"><a href="https://pan.baidu.com/s/1ogY5eC1eb3IHemOsVO-ieg">hdhn</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1WzYf-QmAB1YjfEMLdkAIeg">xtux</a></td>
   </tr>
   <tr>
     <td align="center">SoftTriple</td>
@@ -305,7 +305,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
-    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1L7iUrQmtzlaSOVqLjfv-Tw">5qb9</a></td>
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
@@ -321,7 +321,7 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"></td>
     <td align="center"></td>
     <td align="center"></td>
-    <td align="center"><a href="https://pan.baidu.com/s/1yZhkba1EU79LwqgizDzTUA">agdw</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1YWRsng6X9lq1yVNbJv6aVQ">inai</a></td>
   </tr>
   <tr>
     <td align="center">OSSCo</td>
@@ -337,21 +337,11 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
     <td align="center"><b></b></td>
     <td align="center"><b></b></td>
     <td align="center"><b></b></td>
-    <td align="center"><a href="https://pan.baidu.com/s/1ForxWPJ_k3Eq_EXgLtpHCA">azvx</a></td>
+    <td align="center"><a href="https://pan.baidu.com/s/1Jh0zTifYl2ul9__R7WrSuw">q6ji</a></td>
   </tr>
 </tbody>
 </table>
 
-## Results
-
-### Cityscapes
-
-![tokyo](result/cityscapes.png)
-
-### CUFSF
-
-![cityscapes](result/cufsf.png)
-
-### T-SNE
+### T-SNE (CUFSF)
 
 ![tsne](result/tsne.png)
