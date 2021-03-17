@@ -31,6 +31,7 @@ npid_vectors = torch.load('result/{}_npid_vectors.pth'.format(data_name)).cpu().
 simclr_vectors = torch.load('result/{}_simclr_vectors.pth'.format(data_name)).cpu().numpy()
 proxyanchor_vectors = torch.load('result/{}_proxyanchor_vectors.pth'.format(data_name)).cpu().numpy()
 softtriple_vectors = torch.load('result/{}_softtriple_vectors.pth'.format(data_name)).cpu().numpy()
+ossco_vectors = torch.load('result/{}_ossco_vectors.pth'.format(data_name)).cpu().numpy()
 
 labels = torch.cat((torch.ones(len(simclr_vectors) // 2, dtype=torch.long),
                     torch.zeros(len(simclr_vectors) // 2, dtype=torch.long)), dim=0).cpu().numpy()
@@ -47,3 +48,5 @@ proxyanchor_results = tsne.fit_transform(proxyanchor_vectors)
 plot_embedding(proxyanchor_results, labels, 'proxyanchor_{}'.format(data_name))
 softtriple_results = tsne.fit_transform(softtriple_vectors)
 plot_embedding(softtriple_results, labels, 'softtriple_{}'.format(data_name))
+ossco_results = tsne.fit_transform(ossco_vectors)
+plot_embedding(ossco_results, labels, 'ossco_{}'.format(data_name))

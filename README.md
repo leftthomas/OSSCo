@@ -1,7 +1,6 @@
 # OSSCo
 
-A PyTorch implementation of OSSCo based on ICCV 2021 paper
-[Fully Unsupervised Image Retrieval With One-Shot Synthesis-based Contrastive Learning]().
+A PyTorch implementation of OSSCo based on ICCV 2021 paper [Fully Unsupervised Cross-Domain Image Retrieval]().
 
 ![Network Architecture](result/structure.png)
 
