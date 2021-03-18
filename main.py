@@ -128,7 +128,7 @@ for r in range(1, rounds + 1):
                     pred_fake_content, target_fake_content)
                 # cycle loss
                 cycle_loss = criterion_cycle(G(fake_style), content) + criterion_cycle(F(fake_content), style)
-                fg_loss = adversarial_loss + 100 * cycle_loss
+                fg_loss = adversarial_loss + 10 * cycle_loss
                 fg_loss.backward()
                 optimizer_FG.step()
                 lr_scheduler_FG.step()
