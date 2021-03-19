@@ -1,8 +1,8 @@
 # OSSCo
 
-A PyTorch implementation of OSSCo based on ICCV 2021 paper [Fully Unsupervised Cross-Domain Image Retrieval]().
+A PyTorch implementation of OSSCo based on ICCV 2021 paper [Fully Unsupervised Domain-Agnostic Image Retrieval]().
 
-![Network Architecture](result/structure.png)
+![Network Architecture](result/structure.jpg)
 
 ## Requirements
 
@@ -69,7 +69,7 @@ optional arguments:
 # args for ossco
 --style_num                   Number of used styles [default value is 8]
 --gan_iter                    Number of bp to train gan model [default value is 4000]
---rounds                      Number of round to train whole model [default value is 3]
+--rounds                      Number of round to train whole model [default value is 5]
 ```
 
 For example, to train `npid` on `cufsf` dataset, report `R@1` and `R@5`:
@@ -199,18 +199,18 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
   <tr>
     <td align="center">OSSCo</td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
+    <td align="center"><b>98.6</b></td>
+    <td align="center"><b>99.2</b></td>
+    <td align="center"><b>99.6</b></td>
+    <td align="center"><b>99.8</b></td>
+    <td align="center"><b>99.0</b></td>
+    <td align="center"><b>99.4</b></td>
+    <td align="center"><b>99.6</b></td>
+    <td align="center"><b>99.6</b></td>
+    <td align="center"><b>97.0</b></td>
+    <td align="center"><b>98.6</b></td>
+    <td align="center"><b>99.2</b></td>
+    <td align="center"><b>99.5</b></td>
     <td align="center"><a href="https://pan.baidu.com/s/19d3v1PTnX-Z3dH7ifeY1oA">cb2b</a></td>
   </tr>
 </tbody>
@@ -325,18 +325,18 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
   <tr>
     <td align="center">OSSCo</td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
-    <td align="center"><b></b></td>
+    <td align="center"><b>82.4</b></td>
+    <td align="center"><b>93.5</b></td>
+    <td align="center"><b>97.5</b></td>
+    <td align="center"><b>99.5</b></td>
+    <td align="center"><b>88.4</b></td>
+    <td align="center"><b>98.0</b></td>
+    <td align="center"><b>99.5</b></td>
+    <td align="center"><b>99.5</b></td>
+    <td align="center"><b>55.0</b></td>
+    <td align="center"><b>70.4</b></td>
+    <td align="center"><b>87.2</b></td>
+    <td align="center"><b>94.5</b></td>
     <td align="center"><a href="https://pan.baidu.com/s/1Jh0zTifYl2ul9__R7WrSuw">q6ji</a></td>
   </tr>
 </tbody>
