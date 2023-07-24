@@ -183,18 +183,18 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
   <tr>
     <td align="center">ProxyAnchor</td>
+    <td align="center">99.6</td>
     <td align="center">100</td>
     <td align="center">100</td>
     <td align="center">100</td>
+    <td align="center">99.6</td>
+    <td align="center">99.8</td>
+    <td align="center">99.8</td>
     <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
-    <td align="center">100</td>
+    <td align="center">98.8</td>
+    <td align="center">99.6</td>
+    <td align="center">99.6</td>
+    <td align="center">99.8</td>
     <td align="center"><a href="https://pan.baidu.com/s/1aEQhoDH3ciAHESbzSfeR6Q">99k3</a></td>
   </tr>
   <tr>
