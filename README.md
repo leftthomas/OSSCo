@@ -199,17 +199,17 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
   </tr>
   <tr>
     <td align="center">OSSCo</td>
-    <td align="center"><b>98.6</b></td>
     <td align="center"><b>99.2</b></td>
     <td align="center"><b>99.6</b></td>
     <td align="center"><b>99.8</b></td>
-    <td align="center"><b>99.0</b></td>
+    <td align="center"><b>99.8</b></td>
+    <td align="center"><b>99.2</b></td>
+    <td align="center"><b>99.4</b></td>
     <td align="center"><b>99.4</b></td>
     <td align="center"><b>99.6</b></td>
-    <td align="center"><b>99.6</b></td>
-    <td align="center"><b>97.0</b></td>
-    <td align="center"><b>98.6</b></td>
-    <td align="center"><b>99.2</b></td>
+    <td align="center"><b>96.9</b></td>
+    <td align="center"><b>98.9</b></td>
+    <td align="center"><b>99.4</b></td>
     <td align="center"><b>99.5</b></td>
     <td align="center"><a href="https://pan.baidu.com/s/19d3v1PTnX-Z3dH7ifeY1oA">cb2b</a></td>
   </tr>
