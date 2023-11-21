@@ -1,6 +1,6 @@
 # OSSCo
 
-A PyTorch implementation of OSSCo based on TCSVT 2024 paper [Fully Unsupervised Domain-Agnostic Image Retrieval]().
+A PyTorch implementation of OSSCo based on TCSVT 2024 paper [Fully Unsupervised Domain-Agnostic Image Retrieval](https://doi.org/10.1109/tcsvt.2023.3335147).
 
 ![Network Architecture](result/structure.jpg)
 
