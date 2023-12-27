@@ -1,6 +1,6 @@
 # OSSCo
 
-A PyTorch implementation of OSSCo based on TCSVT 2024 paper [Fully Unsupervised Domain-Agnostic Image Retrieval](https://doi.org/10.1109/tcsvt.2023.3335147).
+A PyTorch implementation of OSSCo based on TCSVT 2023 paper [Fully Unsupervised Domain-Agnostic Image Retrieval](https://doi.org/10.1109/tcsvt.2023.3335147).
 
 ![Network Architecture](result/structure.jpg)
 
@@ -345,3 +345,16 @@ and `weight decay` is `1e-6`. `batch size` is `16` for `ossco`, `32` for `simclr
 ### T-SNE (CUFSF)
 
 ![tsne](result/tsne.png)
+
+##  Citing OSSCo
+
+If you find OSSCo helpful, please consider citing:
+```
+@article{zheng2023fully,
+  title={Fully Unsupervised Domain-Agnostic Image Retrieval},
+  author={Zheng, Ziqiang and Ren, Hao and Wu, Yang and Zhang, Weichuan and Lu, Hong and Yang, Yang and Shen, Heng Tao},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology},
+  year={2023},
+  publisher={IEEE}
+}
+```
